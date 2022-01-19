@@ -126,7 +126,7 @@ Any of an option's registered aliases or shortcuts can be used for the `name` pa
 
 [[ `func (parser *ArgParser) HasArgs() bool` ]]
 
-    Returns `true` if at least one positional argument has been found.
+    Returns `true` if at least one positional argument was found.
 
 
 
