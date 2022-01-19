@@ -10,7 +10,7 @@ We also want to support an `--out/-o` option so the user can specify an output f
 First we import the Argo package:
 
 ::: code go
-    import "github.com/dmulholl/argo/v3"
+    import "github.com/dmulholl/argo"
 
 Next we create an `ArgParser` instance:
 

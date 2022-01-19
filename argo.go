@@ -89,10 +89,6 @@ func (stream *argstream) hasNext() bool {
 /*  ArgParser  */
 /* ----------- */
 
-// Callback function for a command. If the command is found, its callback will be called and
-// passed the command's name and ArgParser instance.
-type CommandCallback func(string, *ArgParser)
-
 // An ArgParser instance stores registered options and commands.
 type ArgParser struct {
 	// Help text for the application or command.
@@ -111,7 +107,7 @@ type ArgParser struct {
 	arguments []string
 
 	// Stores the callback function for a command parser.
-	callback CommandCallback
+	Callback func(string, *ArgParser)
 
 	// Stores the command name, if a command was found while parsing.
 	command string
@@ -301,25 +297,11 @@ func (parser *ArgParser) ArgsAsFloats() []float64 {
 /*  ArgParser: commands.  */
 /* ---------------------- */
 
-// NewCommand registers a new command. Returns the command's `ArgParser` instance.
-func (parser *ArgParser) NewCommand(name, helptext string) *ArgParser {
+// NewCommand registers a new command. The `name` parameter accepts an unlimited number of space-
+// separated aliases for the command. Returns the command's `ArgParser` instance.
+func (parser *ArgParser) NewCommand(name string) *ArgParser {
 	parser.enableHelpCommand = true
 	cmdParser := NewParser()
-	cmdParser.Helptext = helptext
-	for _, alias := range strings.Split(name, " ") {
-		parser.commands[alias] = cmdParser
-	}
-	return cmdParser
-}
-
-// NewCommandWithCallback registers a new command. Returns the command's `ArgParser` instance. If
-// the command is found, the callback function will be called and passed the command's name and the
-// command's parser instance.
-func (parser *ArgParser) NewCommandWithCallback(name, helptext string, callback CommandCallback) *ArgParser {
-	parser.enableHelpCommand = true
-	cmdParser := NewParser()
-	cmdParser.Helptext = helptext
-	cmdParser.callback = callback
 	for _, alias := range strings.Split(name, " ") {
 		parser.commands[alias] = cmdParser
 	}
@@ -385,13 +367,15 @@ func (parser *ArgParser) parseStream(stream *argstream) {
 		}
 
 		// Is the argument a registered command?
-		if cmdParser, found := parser.commands[arg]; found {
-			parser.command = arg
-			cmdParser.parseStream(stream)
-			if cmdParser.callback != nil {
-				cmdParser.callback(arg, cmdParser)
+		if isFirstArg {
+			if cmdParser, found := parser.commands[arg]; found {
+				parser.command = arg
+				cmdParser.parseStream(stream)
+				if cmdParser.Callback != nil {
+					cmdParser.Callback(arg, cmdParser)
+				}
+				break
 			}
-			break
 		}
 
 		// Is the argument the automatic 'help' command?

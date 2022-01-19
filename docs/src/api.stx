@@ -132,11 +132,6 @@ Any of an option's registered aliases or shortcuts can be used for the `name` pa
 
 ### Commands
 
-[[ `type CommandCallback func(string, *ArgParser)` ]]
-
-    A callback function for a command should accept two arguments --- the command's name and the command's `ArgParser` instance.
-
-
 [[ `func (parser *ArgParser) CommandName() string` ]]
 
     Returns the command name, if the parser has found a command.
@@ -147,24 +142,18 @@ Any of an option's registered aliases or shortcuts can be used for the `name` pa
     Returns the command's `ArgParser` instance, if the parser has found a command.
 
 
+[[ `func (parser *ArgParser) EnableHelpCommand(enable bool)` ]]
+
+    This boolean switch toggles support for an automatic `help` command which prints subcommand helptext. The value defaults to `false` but gets toggled automatically to `true` whenever a command is registered. You can use this function to disable the feature if required.
+
+
 [[ `func (parser *ArgParser) HasCommand() bool` ]]
 
     Returns `true` if the parser has found a command.
 
 
-[[ `func (parser *ArgParser) EnableHelpCommand() bool` ]]
-
-    This boolean switch toggles support for an automatic `help` command which prints subcommand helptext. The value defaults to `false` but gets toggled automatically to `true` whenever a command is registered. You can use this function to disable the feature if required.
-
-
-[[ `func (parser *ArgParser) NewCommand(name, helptext string) *ArgParser` ]]
+[[ `func (parser *ArgParser) NewCommand(name string) *ArgParser` ]]
 
     Registers a new command.
+    The `name` parameter accepts an unlimited number of space-separated aliases for the command.
     Returns the command's `ArgParser` instance.
-
-
-[[ `func (parser *ArgParser) NewCommandWithCallback(name, helptext string, callback CommandCallback) *ArgParser` ]]
-
-    Registers a new command.
-    Returns the command's `ArgParser` instance.
-    If the command is found the callback function will be called and passed the command's name and `ArgParser` instance.

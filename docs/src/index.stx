@@ -36,7 +36,8 @@ Import the `argo` package:
 ### Links
 
 * [Github](https://github.com/dmulholl/argo)
-* [Example](https://github.com/dmulholl/argo/blob/master/example/main.go)
+* [Simple Example](https://github.com/dmulholl/argo/blob/master/examples/simple/main.go)
+* [Command Example](https://github.com/dmulholl/argo/blob/master/examples/command/main.go)
 
 
 

@@ -649,7 +649,7 @@ func TestPositionalArgsAsFloats(t *testing.T) {
 
 func TestCommandAbsent(t *testing.T) {
 	parser := NewParser()
-	parser.NewCommand("cmd", "helptext")
+	parser.NewCommand("cmd")
 	parser.ParseArgs([]string{})
 	if parser.HasCommand() != false {
 		t.Fail()
@@ -658,7 +658,7 @@ func TestCommandAbsent(t *testing.T) {
 
 func TestCommandPresent(t *testing.T) {
 	parser := NewParser()
-	cmdParser := parser.NewCommand("cmd", "helptext")
+	cmdParser := parser.NewCommand("cmd")
 	parser.ParseArgs([]string{"cmd"})
 	if parser.HasCommand() != true {
 		t.Fail()
@@ -673,7 +673,7 @@ func TestCommandPresent(t *testing.T) {
 
 func TestCommandWithOptions(t *testing.T) {
 	parser := NewParser()
-	cmdParser := parser.NewCommand("cmd", "helptext")
+	cmdParser := parser.NewCommand("cmd")
 	cmdParser.NewFlag("bool")
 	cmdParser.NewStringOption("string", "default")
 	cmdParser.NewIntOption("int", 101)

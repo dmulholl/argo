@@ -17,7 +17,7 @@
                 <p class="tagline">An argument-parsing library for Go.</p>
             
             
-                <p class="version">Version 0.1.0</p>
+                <p class="version">Version 0.2.0</p>
             
             <nav class="menu">
                 <input id="menu-check" type="checkbox"/>
@@ -298,16 +298,6 @@ Commands
 <dl>
 <div>
 <dt>
-<code>type CommandCallback func(string, *ArgParser)</code>
-</dt>
-<dd>
-<p>
-A callback function for a command should accept two arguments &mdash; the command's name and the command's <code>ArgParser</code> instance.
-</p>
-</dd>
-</div>
-<div>
-<dt>
 <code>func (parser *ArgParser) CommandName() string</code>
 </dt>
 <dd>
@@ -328,6 +318,16 @@ Returns the command's <code>ArgParser</code> instance, if the parser has found a
 </div>
 <div>
 <dt>
+<code>func (parser *ArgParser) EnableHelpCommand(enable bool)</code>
+</dt>
+<dd>
+<p>
+This boolean switch toggles support for an automatic <code>help</code> command which prints subcommand helptext. The value defaults to <code>false</code> but gets toggled automatically to <code>true</code> whenever a command is registered. You can use this function to disable the feature if required.
+</p>
+</dd>
+</div>
+<div>
+<dt>
 <code>func (parser *ArgParser) HasCommand() bool</code>
 </dt>
 <dd>
@@ -338,34 +338,13 @@ Returns <code>true</code> if the parser has found a command.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) EnableHelpCommand() bool</code>
-</dt>
-<dd>
-<p>
-This boolean switch toggles support for an automatic <code>help</code> command which prints subcommand helptext. The value defaults to <code>false</code> but gets toggled automatically to <code>true</code> whenever a command is registered. You can use this function to disable the feature if required.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) NewCommand(name, helptext string) *ArgParser</code>
+<code>func (parser *ArgParser) NewCommand(name string) *ArgParser</code>
 </dt>
 <dd>
 <p>
 Registers a new command.
+The <code>name</code> parameter accepts an unlimited number of space-separated aliases for the command.
 Returns the command's <code>ArgParser</code> instance.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) NewCommandWithCallback(name, helptext string, callback CommandCallback) *ArgParser</code>
-</dt>
-<dd>
-<p>
-Registers a new command.
-Returns the command's <code>ArgParser</code> instance.
-If the command is found the callback function will be called and passed the command's name and <code>ArgParser</code> instance.
 </p>
 </dd>
 </div>
