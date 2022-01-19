@@ -4,9 +4,9 @@ import (
 	"testing"
 )
 
-// -----------------------------------------------------------------------------
-// Flags.
-// -----------------------------------------------------------------------------
+/* -------- */
+/*  Flags.  */
+/* -------- */
 
 func TestFlagEmpty(t *testing.T) {
 	parser := NewParser()
@@ -80,9 +80,9 @@ func TestBoolMultiShortform(t *testing.T) {
 	}
 }
 
-// -----------------------------------------------------------------------------
-// String options.
-// -----------------------------------------------------------------------------
+/* ----------------- */
+/*  String options.  */
+/* ----------------- */
 
 func TestStringOptionEmpty(t *testing.T) {
 	parser := NewParser()
@@ -186,9 +186,9 @@ func TestStringListShortform(t *testing.T) {
 	}
 }
 
-// -----------------------------------------------------------------------------
-// Integer options.
-// -----------------------------------------------------------------------------
+/* ------------------ */
+/*  Integer options.  */
+/* ------------------ */
 
 func TestIntOptionEmpty(t *testing.T) {
 	parser := NewParser()
@@ -307,9 +307,9 @@ func TestIntListShortform(t *testing.T) {
 	}
 }
 
-// -----------------------------------------------------------------------------
-// Float options.
-// -----------------------------------------------------------------------------
+/* ---------------- */
+/*  Float options.  */
+/* ---------------- */
 
 func TestFloatOptionEmpty(t *testing.T) {
 	parser := NewParser()
@@ -422,9 +422,9 @@ func TestFloatListShortform(t *testing.T) {
 	}
 }
 
-// -----------------------------------------------------------------------------
-// Multiple options.
-// -----------------------------------------------------------------------------
+/* -------------------------------- */
+/*  Multiple option types at once.  */
+/* -------------------------------- */
 
 func TestMultiOptionsEmpty(t *testing.T) {
 	parser := NewParser()
@@ -555,9 +555,9 @@ func TestMultiOptionsShortform(t *testing.T) {
 	}
 }
 
-// -----------------------------------------------------------------------------
-// Condensed short-form options.
-// -----------------------------------------------------------------------------
+/* ------------------------------- */
+/*  Condensed short-form options.  */
+/* ------------------------------- */
 
 func TestCondensedOptions(t *testing.T) {
 	parser := NewParser()
@@ -580,9 +580,9 @@ func TestCondensedOptions(t *testing.T) {
 	}
 }
 
-// -----------------------------------------------------------------------------
-// Positional arguments.
-// -----------------------------------------------------------------------------
+/* ----------------------- */
+/*  Positional arguments.  */
+/* ----------------------- */
 
 func TestPositionalArgsEmpty(t *testing.T) {
 	parser := NewParser()
@@ -643,9 +643,9 @@ func TestPositionalArgsAsFloats(t *testing.T) {
 	}
 }
 
-// -----------------------------------------------------------------------------
-// Commands.
-// -----------------------------------------------------------------------------
+/* ----------- */
+/*  Commands.  */
+/* ----------- */
 
 func TestCommandAbsent(t *testing.T) {
 	parser := NewParser()
