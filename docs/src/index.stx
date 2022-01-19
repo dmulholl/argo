@@ -29,7 +29,7 @@ meta_title: Argo &mdash; a simple argument-parsing library for Go
 Import the `argo` package:
 
 ::: code go
-    import "github.com/dmulholl/argo/v3"
+    import "github.com/dmulholl/argo"
 
 
 
