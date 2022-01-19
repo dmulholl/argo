@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/dmulholl/argo/v3"
+	"github.com/dmulholl/argo"
 )
 
 func main() {
