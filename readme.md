@@ -1,4 +1,4 @@
-# Janus
+# Argo
 
 A simple Go library for parsing command line arguments.
 
