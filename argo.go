@@ -10,9 +10,8 @@ import (
 	"unicode"
 )
 
-// Prints a message to stderr and exits with a non-zero error code.
-func exit(msg string) {
-	fmt.Fprintf(os.Stderr, "Error: %v.\n", msg)
+func exit(message string) {
+	fmt.Fprintf(os.Stderr, "Error: %v.\n", message)
 	os.Exit(1)
 }
 
