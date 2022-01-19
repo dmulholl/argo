@@ -2,8 +2,8 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>API Reference</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Argo &mdash; API Reference</title>
         <link rel="stylesheet" href="assets/fonts.css">
         <link rel="stylesheet" href="assets/graphite.css">
         <link rel="stylesheet" href="assets/pygments.css">
@@ -12,12 +12,12 @@
     </head>
     <body class="node-api node">
         <header class="masthead">
-            <h1><a href="index.html">Janus</a></h1>
+            <h1><a href="index.html">Argo</a></h1>
             
-            <p class="tagline">An argument-parsing library for Go.</p>
+                <p class="tagline">A simple argument-parsing library for Go.</p>
             
             
-            <p class="version">Version 2.1.0</p>
+                <p class="version">Version 3.0.0</p>
             
             <nav class="menu">
                 <input id="menu-check" type="checkbox"/>
@@ -28,9 +28,11 @@
                 </label>
                 <ul>
 <li><a href="index.html">Home</a></li>
+<li><a href="quickstart.html">Quickstart</a></li>
 <li><a href="cli.html">CLI</a></li>
 <li><a href="api.html">API</a></li>
-<li><a href="https://github.com/dmulholl/janus">Github</a></li>
+<li><a href="license.html">License</a></li>
+<li><a href="https://github.com/dmulholl/argo">Github</a></li>
 </ul>
             </nav>
         </header>
@@ -42,76 +44,50 @@
             </header>
             <ul class="stx-toc">
 <li>
-<a href="#basic-usage">Basic Usage</a>
+<a href="#setup">Setup</a>
 </li>
 <li>
-<a href="#register-options">Register Options</a>
+<a href="#flags-and-options">Flags and Options</a>
 </li>
 <li>
-<a href="#retrieve-a-single-value">Retrieve A Single Value</a>
+<a href="#retrieving-values">Retrieving Values</a>
 </li>
 <li>
-<a href="#retrieve-multiple-values">Retrieve Multiple Values</a>
-</li>
-<li>
-<a href="#retrieve-positional-arguments">Retrieve Positional Arguments</a>
+<a href="#positional-arguments">Positional Arguments</a>
 </li>
 <li>
 <a href="#commands">Commands</a>
 </li>
 </ul>
 <hr>
+<h3 id="setup">
+Setup
+</h3>
+<dl>
+<div>
+<dt>
+<code>func NewParser() *ArgParser</code>
+</dt>
+<dd>
 <p>
-Install directly from Github:
+Creates a new ArgParser instance.
 </p>
-<pre>
-$ go get github.com/dmulholl/janus/v2
-</pre>
+</dd>
+</div>
+<div>
+<dt>
+<code>func (parser *ArgParser) Parse()</code>
+</dt>
+<dd>
 <p>
-Import the <code>janus</code> package:
+Parses the application's command line arguments.
 </p>
-<pre class="lang-go pygments" data-lang="go">
-<span class="kn">import</span> <span class="s">&quot;github.com/dmulholl/janus/v2&quot;</span>
-</pre>
-<p>
-Alternatively, you can incorporate the single, public-domain <code>janus.go</code> file directly into your application. The library has no external dependencies.
-</p>
-<h2 id="basic-usage">
-Basic Usage
-</h2>
-<p>
-Initialize an argument parser, optionally specifying the application's help text and version string:
-</p>
-<pre class="lang-go pygments" data-lang="go">
-<span class="nx">parser</span> <span class="o">:=</span> <span class="nx">janus</span><span class="p">.</span><span class="nx">NewParser</span><span class="p">()</span>
-
-<span class="nx">parser</span><span class="p">.</span><span class="nx">Helptext</span> <span class="p">=</span> <span class="s">&quot;Usage: foobar...&quot;</span>
-<span class="nx">parser</span><span class="p">.</span><span class="nx">Version</span> <span class="p">=</span> <span class="s">&quot;1.0&quot;</span>
-</pre>
-<p>
-Specifying help text activates an automatic <code>--help</code> flag; specifying a version string activates an automatic <code>--version</code> flag. (Automatic <code>-h</code> and <code>-v</code> shortcuts are also activated unless registered by other options.)
-</p>
-<p>
-You can now register your application's options and commands on the parser using the registration functions described below. Once the required options and commands have been registered, call the parser's <code>Parse()</code> method to process the application's command line arguments:
-</p>
-<pre class="lang-go pygments" data-lang="go">
-<span class="nx">parser</span><span class="p">.</span><span class="nx">Parse</span><span class="p">()</span>
-</pre>
-<p>
-Parsed option values can be retrieved from the parser instance itself.
-</p>
-<h2 id="register-options">
-Register Options
-</h2>
-<p>
-Janus supports long-form options, <code>--foo</code>, with single-character shortcuts, <code>-f</code>.
-</p>
-<p>
-An option can have an unlimited number of long and short-form aliases. Aliases are specified via the <code>name</code> parameter which accepts a string of space-separated alternatives, e.g. <code>&quot;foo f&quot;</code>.
-</p>
-<p>
-Option values can be separated on the command line by either a space, <code>--foo 123</code>, or an equals symbol, <code>--foo=123</code>.
-</p>
+</dd>
+</div>
+</dl>
+<h3 id="flags-and-options">
+Flags and Options
+</h3>
 <dl>
 <div>
 <dt>
@@ -119,49 +95,53 @@ Option values can be separated on the command line by either a space, <code>--fo
 </dt>
 <dd>
 <p>
-Register a flag (a boolean option) with a default value of <code>false</code>. Flag options take no arguments but are either present (<code>true</code>) or absent (<code>false</code>).
+Registers a new flag.
+The <code>name</code> parameter accepts an unlimited number of space-separated aliases and single-character shortcuts.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) NewFloat(name string, fallback float64 = 0.0)</code>
+<code>func (parser *ArgParser) NewFloatOption(name string, fallback float64)</code>
 </dt>
 <dd>
 <p>
-Register a floating-point option, optionally specifying a custom fallback value. (The default fallback value is <code>0</code>.)
+Registers a new float-valued option.
+The <code>name</code> parameter accepts an unlimited number of space-separated aliases and single-character shortcuts.
+The <code>fallback</code> parameter specifies the option's default value.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) NewInt(name string, fallback int = 0)</code>
+<code>func (parser *ArgParser) NewIntOption(name string, fallback int64)</code>
 </dt>
 <dd>
 <p>
-Register an integer option, optionally specifying a custom fallback value. (The default fallback value is <code>0</code>.)
+Registers a new integer-valued option.
+The <code>name</code> parameter accepts an unlimited number of space-separated aliases and single-character shortcuts.
+The <code>fallback</code> parameter specifies the option's default value.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) NewString(name string, fallback string = &quot;&quot;)</code>
+<code>func (parser *ArgParser) NewStringOption(name string, fallback string)</code>
 </dt>
 <dd>
 <p>
-Register a string option, optionally specifying a custom fallback value. (The default fallback value is the empty string.)
+Registers a new string-valued option.
+The <code>name</code> parameter accepts an unlimited number of space-separated aliases and single-character shortcuts.
+The <code>fallback</code> parameter specifies the option's default value.
 </p>
 </dd>
 </div>
 </dl>
-<h2 id="retrieve-a-single-value">
-Retrieve A Single Value
-</h2>
+<h3 id="retrieving-values">
+Retrieving Values
+</h3>
 <p>
-An option's value can be retrieved from the parser instance using any of its registered aliases.
-</p>
-<p>
-Each option maintains an internal array of values &mdash; the value of the option is the final value in the array or the fallback value if the array is empty.
+Any of an option's registered aliases or shortcuts can be used for the <code>name</code> parameter in the functions below.
 </p>
 <dl>
 <div>
@@ -176,93 +156,82 @@ Returns the number of times the specified option was found.
 </div>
 <div>
 <dt>
+<code>func (parser *ArgParser) FloatValue(name string) float64</code>
+</dt>
+<dd>
+<p>
+Returns the value of the specified float-valued option.
+</p>
+</dd>
+</div>
+<div>
+<dt>
+<code>func (parser *ArgParser) FloatValues(name string) []float64</code>
+</dt>
+<dd>
+<p>
+Returns the specified float-valued option's list of values.
+</p>
+</dd>
+</div>
+<div>
+<dt>
 <code>func (parser *ArgParser) Found(name string) bool</code>
 </dt>
 <dd>
 <p>
-Returns true if the specified option was found.
+Returns <code>true</code> if the specified option was found.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetFloat(name string) float64</code>
+<code>func (parser *ArgParser) IntValue(name string) int64</code>
 </dt>
 <dd>
 <p>
-Returns the value of the specified floating-point option.
+Returns the value of the specified integer-valued option.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetInt(name string) int</code>
+<code>func (parser *ArgParser) IntValues(name string) []int64</code>
 </dt>
 <dd>
 <p>
-Returns the value of the specified integer option.
+Returns the specified integer-valued option's list of values.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetString(name string) string</code>
+<code>func (parser *ArgParser) StringValue(name string) string</code>
 </dt>
 <dd>
 <p>
-Returns the value of the specified string option.
+Returns the value of the specified string-valued option.
+</p>
+</dd>
+</div>
+<div>
+<dt>
+<code>func (parser *ArgParser) StringValues(name string) []string</code>
+</dt>
+<dd>
+<p>
+Returns the specified string-valued option's list of values.
 </p>
 </dd>
 </div>
 </dl>
-<h2 id="retrieve-multiple-values">
-Retrieve Multiple Values
-</h2>
-<p>
-An option's internal array of values can be retrieved from the parser instance using any of its registered aliases.
-</p>
+<h3 id="positional-arguments">
+Positional Arguments
+</h3>
 <dl>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetFloatList(name string) []float64</code>
-</dt>
-<dd>
-<p>
-Returns the specified option's list of values.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) GetIntList(name string) []int</code>
-</dt>
-<dd>
-<p>
-Returns the specified option's list of values.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) GetStringList(name string) []string</code>
-</dt>
-<dd>
-<p>
-Returns the specified option's list of values.
-</p>
-</dd>
-</div>
-</dl>
-<h2 id="retrieve-positional-arguments">
-Retrieve Positional Arguments
-</h2>
-<p>
-Options can be preceded, followed, or interspaced with positional arguments.
-</p>
-<dl>
-<div>
-<dt>
-<code>func (parser *ArgParser) GetArg(index int) string</code>
+<code>func (parser *ArgParser) Arg(index int) string</code>
 </dt>
 <dd>
 <p>
@@ -272,7 +241,7 @@ Returns the positional argument at the specified index.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetArgs() []string</code>
+<code>func (parser *ArgParser) Args() []string</code>
 </dt>
 <dd>
 <p>
@@ -282,7 +251,7 @@ Returns the positional arguments as a slice of strings.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetArgsAsFloats() []float64</code>
+<code>func (parser *ArgParser) ArgsAsFloats() []float64</code>
 </dt>
 <dd>
 <p>
@@ -293,7 +262,7 @@ Exits with an error message on failure.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetArgsAsInts() []int</code>
+<code>func (parser *ArgParser) ArgsAsInts() []int64</code>
 </dt>
 <dd>
 <p>
@@ -304,17 +273,7 @@ integers. Exits with an error message on failure.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) HasArgs() bool</code>
-</dt>
-<dd>
-<p>
-Returns true if at least one positional argument has been found.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) NumArgs() int</code>
+<code>func (parser *ArgParser) CountArgs() int</code>
 </dt>
 <dd>
 <p>
@@ -322,43 +281,34 @@ Returns the number of positional arguments.
 </p>
 </dd>
 </div>
+<div>
+<dt>
+<code>func (parser *ArgParser) HasArgs() bool</code>
+</dt>
+<dd>
+<p>
+Returns <code>true</code> if at least one positional argument has been found.
+</p>
+</dd>
+</div>
 </dl>
-<h2 id="commands">
+<h3 id="commands">
 Commands
-</h2>
-<p>
-Janus supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the <code>NewCmd()</code> method:
-</p>
-<pre class="lang-go pygments" data-lang="go">
-<span class="kd">func</span> <span class="p">(</span><span class="nx">parser</span> <span class="o">*</span><span class="nx">ArgParser</span><span class="p">)</span> <span class="nx">NewCmd</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">helptext</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">callback</span> <span class="kd">func</span><span class="p">(</span><span class="o">*</span><span class="nx">ArgParser</span><span class="p">))</span> <span class="o">*</span><span class="nx">ArgParser</span>
-</pre>
-<p>
-This method returns a new <code>ArgParser</code> instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call <code>Parse()</code> on a command parser - if a command is found, its arguments are parsed automatically.)
-</p>
-<ul>
-<li>
-<p>
-Like options, commands can have an unlimited number of aliases specified via the <code>name</code> string.
-</p>
-</li>
-<li>
-<p>
-Commands support an automatic <code>--help</code> flag and an automatic <code>help &lt;name&gt;</code> command using the specified help text.
-</p>
-</li>
-<li>
-<p>
-The specified callback function will be called if the command is found. The callback should accept the command's <code>ArgParser</code> instance as its sole argument and should have no return value.
-</p>
-</li>
-</ul>
-<p>
-The following <code>ArgParser</code> methods are also available for processing commands manually:
-</p>
+</h3>
 <dl>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetCmdName() string</code>
+<code>type CommandCallback func(string, *ArgParser)</code>
+</dt>
+<dd>
+<p>
+A callback function for a command should accept two arguments &mdash; the command's name and the command's <code>ArgParser</code> instance.
+</p>
+</dd>
+</div>
+<div>
+<dt>
+<code>func (parser *ArgParser) CommandName() string</code>
 </dt>
 <dd>
 <p>
@@ -368,31 +318,54 @@ Returns the command name, if the parser has found a command.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetCmdParser() *ArgParser</code>
+<code>func (parser *ArgParser) CommandParser() *ArgParser</code>
 </dt>
 <dd>
 <p>
-Returns the command's parser instance, if the parser has found a command.
+Returns the command's <code>ArgParser</code> instance, if the parser has found a command.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) GetParent() *ArgParser</code>
+<code>func (parser *ArgParser) HasCommand() bool</code>
 </dt>
 <dd>
 <p>
-Returns a command parser's parent parser.
+Returns <code>true</code> if the parser has found a command.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) HasCmd() bool</code>
+<code>func (parser *ArgParser) EnableHelpCommand() bool</code>
 </dt>
 <dd>
 <p>
-Returns true if the parser has found a command.
+This boolean switch toggles support for an automatic <code>help</code> command which prints subcommand helptext. The value defaults to <code>false</code> but gets toggled automatically to <code>true</code> whenever a command is registered. You can use this function to disable the feature if required.
+</p>
+</dd>
+</div>
+<div>
+<dt>
+<code>func (parser *ArgParser) NewCommand(name, helptext string) *ArgParser</code>
+</dt>
+<dd>
+<p>
+Registers a new command.
+Returns the command's <code>ArgParser</code> instance.
+</p>
+</dd>
+</div>
+<div>
+<dt>
+<code>func (parser *ArgParser) NewCommandWithCallback(name, helptext string, callback CommandCallback) *ArgParser</code>
+</dt>
+<dd>
+<p>
+Registers a new command.
+Returns the command's <code>ArgParser</code> instance.
+If the command is found the callback function will be called and passed the command's name and <code>ArgParser</code> instance.
 </p>
 </dd>
 </div>

@@ -1,7 +1,10 @@
 ---
 title: Home
-meta title: Janus &mdash; an argument-parsing library for Go
+meta_title: Argo &mdash; a simple argument-parsing library for Go
 ---
+
+**Argo** is a simple Go library for parsing command line arguments.
+
 
 
 ### Features
@@ -23,23 +26,17 @@ meta title: Janus &mdash; an argument-parsing library for Go
 
 ### Installation
 
-Install directly from Github:
-
-    $ go get github.com/dmulholl/janus/v2
-
-Import the `janus` package:
+Import the `argo` package:
 
 ::: code go
-    import "github.com/dmulholl/janus/v2"
-
-Alternatively, you can incorporate the single, public-domain `janus.go` file directly into your application. The library has no external dependencies.
+    import "github.com/dmulholl/argo/v3"
 
 
 
 ### Links
 
-* [Github](https://github.com/dmulholl/janus)
-* [Example](https://github.com/dmulholl/janus/blob/master/example/main.go)
+* [Github](https://github.com/dmulholl/argo)
+* [Example](https://github.com/dmulholl/argo/blob/master/example/main.go)
 
 
 

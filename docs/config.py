@@ -2,7 +2,6 @@
 # Site Configuration File
 # ------------------------------------------------------------------------------
 
-title = "Janus"
-tagline = "An argument-parsing library for Go."
-version = "Version 2.1.0"
-
+title = "Argo"
+tagline = "A simple argument-parsing library for Go."
+version = "Version 3.0.0"

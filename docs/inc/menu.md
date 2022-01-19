@@ -1,4 +1,6 @@
 * [Home](@root/)
+* [Quickstart](@root/quickstart//)
 * [CLI](@root/cli//)
 * [API](@root/api//)
-* [Github](https://github.com/dmulholl/janus)
+* [License](@root/license//)
+* [Github](https://github.com/dmulholl/argo)

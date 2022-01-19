@@ -1,0 +1,52 @@
+---
+title: Quickstart Tutorial
+meta_title: Argo &mdash; Quickstart Tutorial
+---
+
+Imagine we're building a utility for joining MP3 files, something like [MP3cat](https://github.com/dmulholl/mp3cat).
+We want the user to supply the file names as a list of command line arguments.
+We also want to support an `--out/-o` option so the user can specify an output filename and a `--quiet/-q` flag for turning down the program's verbosity.
+
+First we import the Argo package:
+
+::: code go
+    import "github.com/dmulholl/argo/v3"
+
+Next we create an `ArgParser` instance:
+
+::: code go
+	parser := argo.NewParser()
+	parser.Helptext = "Usage: mp3cat..."
+	parser.Version = "1.0"
+
+Supplying a helptext string for the parser activates an automatic `--help/-h` flag; similarly, supplying a version string activates an automatic `--version/-v` flag.
+
+Now we can register our options and flags:
+
+::: code go
+    parser.NewStringOption("out o", "default.mp3")
+    parser.NewFlag("quiet q")
+
+That's it, we're done specifying our interface. Now we can parse the program's command line arguments:
+
+::: code go
+    parser.Parse()
+
+This will exit with a suitable error message for the user if anything goes wrong. Now we can check if the `--quiet` flag was found:
+
+::: code go
+    if parser.Found("quiet") {
+        doStuff()
+    }
+
+And determine our output filepath:
+
+::: code go
+    outpath := parser.StringValue("out")
+
+The input filenames will be collected by the parser into a list of positional arguments:
+
+::: code go
+    for _, filename := range parser.Args() {
+        doStuff()
+    }
