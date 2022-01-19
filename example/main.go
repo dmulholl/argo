@@ -8,7 +8,7 @@ import (
 func main() {
 	// Instantiate an ArgParser instance.
 	parser := argo.NewParser()
-    parser.Helptext = "Usage: example..."
+	parser.Helptext = "Usage: example..."
 	parser.Version = "1.2.3"
 
 	// Register a flag and a string-valued option.
