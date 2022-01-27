@@ -13,7 +13,7 @@ func main() {
 
 	// Register a command, "boo".
 	cmdParser := parser.NewCommand("boo")
-	cmdParser.Helptext = "Usage: boo..."
+	cmdParser.Helptext = "Usage: example boo..."
 	cmdParser.Callback = boo
 
 	// The command can have its own flags and options.
