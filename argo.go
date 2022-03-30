@@ -96,14 +96,14 @@ type ArgParser struct {
 	// The application's version number.
 	Version string
 
+	// Stores positional arguments.
+	Args []string
+
 	// Stores option instances indexed by option name.
 	options map[string]*option
 
 	// Stores command parsers indexed by command name.
 	commands map[string]*ArgParser
-
-	// Stores positional arguments parsed from the input array.
-	arguments []string
 
 	// Stores the callback function for a command parser.
 	Callback func(string, *ArgParser)
@@ -118,9 +118,9 @@ type ArgParser struct {
 // NewParser initializes a new ArgParser instance.
 func NewParser() *ArgParser {
 	return &ArgParser{
-		options:   make(map[string]*option),
-		commands:  make(map[string]*ArgParser),
-		arguments: make([]string, 0),
+		options:  make(map[string]*option),
+		commands: make(map[string]*ArgParser),
+		Args:     make([]string, 0),
 	}
 }
 
@@ -246,29 +246,19 @@ func (parser *ArgParser) FloatValues(name string) []float64 {
 
 // HasArgs returns true if the parser has found one or more positional arguments.
 func (parser *ArgParser) HasArgs() bool {
-	return len(parser.arguments) > 0
+	return len(parser.Args) > 0
 }
 
 // CountArgs returns the number of positional arguments.
 func (parser *ArgParser) CountArgs() int {
-	return len(parser.arguments)
-}
-
-// Arg returns the positional argument at the specified index.
-func (parser *ArgParser) Arg(index int) string {
-	return parser.arguments[index]
-}
-
-// Args returns the positional arguments as a slice of strings.
-func (parser *ArgParser) Args() []string {
-	return parser.arguments
+	return len(parser.Args)
 }
 
 // ArgsAsInts attempts to parse and return the positional arguments as a slice of integers. Exits
 // with an error message if any of the arguments cannot be parsed as an integer.
 func (parser *ArgParser) ArgsAsInts() []int {
 	values := make([]int, 0)
-	for _, arg := range parser.arguments {
+	for _, arg := range parser.Args {
 		value, err := strconv.ParseInt(arg, 0, 0)
 		if err != nil {
 			exit(fmt.Sprintf("cannot parse '%v' as an integer", arg))
@@ -282,7 +272,7 @@ func (parser *ArgParser) ArgsAsInts() []int {
 // with an error message if any of the arguments cannot be parsed as a float.
 func (parser *ArgParser) ArgsAsFloats() []float64 {
 	values := make([]float64, 0)
-	for _, arg := range parser.arguments {
+	for _, arg := range parser.Args {
 		value, err := strconv.ParseFloat(arg, 64)
 		if err != nil {
 			exit(fmt.Sprintf("cannot parse '%v' as a float", arg))
@@ -344,7 +334,7 @@ func (parser *ArgParser) parseStream(stream *argstream) {
 		// If we encounter a -- argument, turn off option-parsing.
 		if arg == "--" {
 			for stream.hasNext() {
-				parser.arguments = append(parser.arguments, stream.next())
+				parser.Args = append(parser.Args, stream.next())
 			}
 			break
 		}
@@ -358,7 +348,7 @@ func (parser *ArgParser) parseStream(stream *argstream) {
 		// Is the argument a short-form option or flag?
 		if strings.HasPrefix(arg, "-") {
 			if arg == "-" || unicode.IsDigit([]rune(arg)[1]) {
-				parser.arguments = append(parser.arguments, arg)
+				parser.Args = append(parser.Args, arg)
 			} else {
 				parser.parseShortOption(arg[1:], stream)
 			}
@@ -392,7 +382,7 @@ func (parser *ArgParser) parseStream(stream *argstream) {
 		}
 
 		// If we get here, we have a positional argument.
-		parser.arguments = append(parser.arguments, arg)
+		parser.Args = append(parser.Args, arg)
 		isFirstArg = false
 	}
 }
@@ -554,8 +544,8 @@ func (parser *ArgParser) String() string {
 	}
 
 	lines = append(lines, "\nArguments:")
-	if len(parser.arguments) > 0 {
-		for _, arg := range parser.arguments {
+	if len(parser.Args) > 0 {
+		for _, arg := range parser.Args {
 			lines = append(lines, fmt.Sprintf("  %v", arg))
 		}
 	} else {

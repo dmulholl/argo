@@ -599,16 +599,10 @@ func TestPositionalArgs(t *testing.T) {
 	if parser.CountArgs() != 2 {
 		t.Fail()
 	}
-	if parser.Arg(0) != "foo" {
+	if parser.Args[0] != "foo" {
 		t.Fail()
 	}
-	if parser.Arg(1) != "bar" {
-		t.Fail()
-	}
-	if parser.Args()[0] != "foo" {
-		t.Fail()
-	}
-	if parser.Args()[1] != "bar" {
+	if parser.Args[1] != "bar" {
 		t.Fail()
 	}
 }
