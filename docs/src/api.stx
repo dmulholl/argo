@@ -11,8 +11,14 @@ meta_title: Argo &mdash; API Reference
 
 [[ `func NewParser() *ArgParser` ]]
 
-    Creates a new ArgParser instance.
+    Creates a new `ArgParser` instance.
 
+    You can specify `.Helptext` and `.Version` strings for the parser.
+    Specifying a helptext string activates an automatic `--help/-h` flag; similarly, specifying a version string activates an automatic `--version/-v` flag.
+
+
+
+### Parsing Arguments
 
 [[ `func (parser *ArgParser) Parse()` ]]
 
@@ -20,7 +26,7 @@ meta_title: Argo &mdash; API Reference
 
 
 
-### Flags and Options
+### Registering Flags and Options
 
 [[ `func (parser *ArgParser) NewFlag(name string)` ]]
 
@@ -35,7 +41,7 @@ meta_title: Argo &mdash; API Reference
     The `fallback` parameter specifies the option's default value.
 
 
-[[ `func (parser *ArgParser) NewIntOption(name string, fallback int64)` ]]
+[[ `func (parser *ArgParser) NewIntOption(name string, fallback int)` ]]
 
     Registers a new integer-valued option.
     The `name` parameter accepts an unlimited number of space-separated aliases and single-character shortcuts.
@@ -71,15 +77,15 @@ Any of an option's registered aliases or shortcuts can be used for the `name` pa
 
 [[ `func (parser *ArgParser) Found(name string) bool` ]]
 
-    Returns `true` if the specified option was found.
+    Returns `true` if the specified flag or option was found.
 
 
-[[ `func (parser *ArgParser) IntValue(name string) int64` ]]
+[[ `func (parser *ArgParser) IntValue(name string) int` ]]
 
     Returns the value of the specified integer-valued option.
 
 
-[[ `func (parser *ArgParser) IntValues(name string) []int64` ]]
+[[ `func (parser *ArgParser) IntValues(name string) []int` ]]
 
     Returns the specified integer-valued option's list of values.
 
@@ -97,14 +103,7 @@ Any of an option's registered aliases or shortcuts can be used for the `name` pa
 
 ### Positional Arguments
 
-[[ `func (parser *ArgParser) Arg(index int) string` ]]
-
-    Returns the positional argument at the specified index.
-
-
-[[ `func (parser *ArgParser) Args() []string` ]]
-
-    Returns the positional arguments as a slice of strings.
+Positional arguments are stored as a slice of strings in the parser's `.Args` property.
 
 
 [[ `func (parser *ArgParser) ArgsAsFloats() []float64` ]]
@@ -113,7 +112,7 @@ Any of an option's registered aliases or shortcuts can be used for the `name` pa
     Exits with an error message on failure.
 
 
-[[ `func (parser *ArgParser) ArgsAsInts() []int64` ]]
+[[ `func (parser *ArgParser) ArgsAsInts() []int` ]]
 
     Attempts to parse and return the positional arguments as a slice of
     integers. Exits with an error message on failure.

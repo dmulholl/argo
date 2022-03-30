@@ -17,7 +17,7 @@
                 <p class="tagline">An argument-parsing library for Go.</p>
             
             
-                <p class="version">Version 0.2.0</p>
+                <p class="version">Version 0.3.0</p>
             
             <nav class="menu">
                 <input id="menu-check" type="checkbox"/>
@@ -47,7 +47,10 @@
 <a href="#setup">Setup</a>
 </li>
 <li>
-<a href="#flags-and-options">Flags and Options</a>
+<a href="#parsing-arguments">Parsing Arguments</a>
+</li>
+<li>
+<a href="#registering-flags-and-options">Registering Flags and Options</a>
 </li>
 <li>
 <a href="#retrieving-values">Retrieving Values</a>
@@ -70,10 +73,19 @@ Setup
 </dt>
 <dd>
 <p>
-Creates a new ArgParser instance.
+Creates a new <code>ArgParser</code> instance.
+</p>
+<p>
+You can specify <code>.Helptext</code> and <code>.Version</code> strings for the parser.
+Specifying a helptext string activates an automatic <code>--help/-h</code> flag; similarly, specifying a version string activates an automatic <code>--version/-v</code> flag.
 </p>
 </dd>
 </div>
+</dl>
+<h3 id="parsing-arguments">
+Parsing Arguments
+</h3>
+<dl>
 <div>
 <dt>
 <code>func (parser *ArgParser) Parse()</code>
@@ -85,8 +97,8 @@ Parses the application's command line arguments.
 </dd>
 </div>
 </dl>
-<h3 id="flags-and-options">
-Flags and Options
+<h3 id="registering-flags-and-options">
+Registering Flags and Options
 </h3>
 <dl>
 <div>
@@ -114,7 +126,7 @@ The <code>fallback</code> parameter specifies the option's default value.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) NewIntOption(name string, fallback int64)</code>
+<code>func (parser *ArgParser) NewIntOption(name string, fallback int)</code>
 </dt>
 <dd>
 <p>
@@ -180,13 +192,13 @@ Returns the specified float-valued option's list of values.
 </dt>
 <dd>
 <p>
-Returns <code>true</code> if the specified option was found.
+Returns <code>true</code> if the specified flag or option was found.
 </p>
 </dd>
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) IntValue(name string) int64</code>
+<code>func (parser *ArgParser) IntValue(name string) int</code>
 </dt>
 <dd>
 <p>
@@ -196,7 +208,7 @@ Returns the value of the specified integer-valued option.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) IntValues(name string) []int64</code>
+<code>func (parser *ArgParser) IntValues(name string) []int</code>
 </dt>
 <dd>
 <p>
@@ -228,27 +240,10 @@ Returns the specified string-valued option's list of values.
 <h3 id="positional-arguments">
 Positional Arguments
 </h3>
+<p>
+Positional arguments are stored as a slice of strings in the parser's <code>.Args</code> property.
+</p>
 <dl>
-<div>
-<dt>
-<code>func (parser *ArgParser) Arg(index int) string</code>
-</dt>
-<dd>
-<p>
-Returns the positional argument at the specified index.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) Args() []string</code>
-</dt>
-<dd>
-<p>
-Returns the positional arguments as a slice of strings.
-</p>
-</dd>
-</div>
 <div>
 <dt>
 <code>func (parser *ArgParser) ArgsAsFloats() []float64</code>
@@ -262,7 +257,7 @@ Exits with an error message on failure.
 </div>
 <div>
 <dt>
-<code>func (parser *ArgParser) ArgsAsInts() []int64</code>
+<code>func (parser *ArgParser) ArgsAsInts() []int</code>
 </dt>
 <dd>
 <p>
