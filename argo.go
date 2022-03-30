@@ -24,10 +24,10 @@ type option struct {
 	kind           string
 	count          int
 	stringValues   []string
-	intValues      []int64
+	intValues      []int
 	floatValues    []float64
 	stringFallback string
-	intFallback    int64
+	intFallback    int
 	floatFallback  float64
 }
 
@@ -38,11 +38,11 @@ func (opt *option) trySetValue(arg string) {
 		opt.stringValues = append(opt.stringValues, arg)
 
 	case "int":
-		value, err := strconv.ParseInt(arg, 0, 64)
+		value, err := strconv.ParseInt(arg, 0, 0)
 		if err != nil {
 			exit(fmt.Sprintf("cannot parse '%v' as an integer", arg))
 		}
-		opt.intValues = append(opt.intValues, value)
+		opt.intValues = append(opt.intValues, int(value))
 
 	case "float":
 		value, err := strconv.ParseFloat(arg, 64)
@@ -153,7 +153,7 @@ func (parser *ArgParser) NewStringOption(name string, fallback string) {
 // NewIntOption registers a new integer-valued option. The `name` parameter accepts an unlimited
 // number of space-separated aliases and single-character shortcuts. The `fallback` parameter
 // specifies the option's default value.
-func (parser *ArgParser) NewIntOption(name string, fallback int64) {
+func (parser *ArgParser) NewIntOption(name string, fallback int) {
 	opt := &option{}
 	opt.kind = "int"
 	opt.intFallback = fallback
@@ -206,7 +206,7 @@ func (parser *ArgParser) StringValue(name string) string {
 }
 
 // IntValue returns the value of the specified integer-valued option.
-func (parser *ArgParser) IntValue(name string) int64 {
+func (parser *ArgParser) IntValue(name string) int {
 	opt := parser.getOpt(name)
 	if len(opt.intValues) > 0 {
 		return opt.intValues[len(opt.intValues)-1]
@@ -231,7 +231,7 @@ func (parser *ArgParser) StringValues(name string) []string {
 }
 
 // IntValues returns the specified integer-valued option's list of values.
-func (parser *ArgParser) IntValues(name string) []int64 {
+func (parser *ArgParser) IntValues(name string) []int {
 	return parser.getOpt(name).intValues
 }
 
@@ -266,14 +266,14 @@ func (parser *ArgParser) Args() []string {
 
 // ArgsAsInts attempts to parse and return the positional arguments as a slice of integers. Exits
 // with an error message if any of the arguments cannot be parsed as an integer.
-func (parser *ArgParser) ArgsAsInts() []int64 {
-	values := make([]int64, 0)
+func (parser *ArgParser) ArgsAsInts() []int {
+	values := make([]int, 0)
 	for _, arg := range parser.arguments {
-		value, err := strconv.ParseInt(arg, 0, 64)
+		value, err := strconv.ParseInt(arg, 0, 0)
 		if err != nil {
 			exit(fmt.Sprintf("cannot parse '%v' as an integer", arg))
 		}
-		values = append(values, value)
+		values = append(values, int(value))
 	}
 	return values
 }
