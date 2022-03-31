@@ -103,8 +103,9 @@ Any of an option's registered aliases or shortcuts can be used for the `name` pa
 
 ### Positional Arguments
 
-Positional arguments are stored as a slice of strings in the parser's `.Args` property.
+Positional arguments (also known as 'free' arguments, i.e. arguments that are not option values) are appended to a slice of strings which can be accessed via the  parser's `.Args` property.
 
+The following convenience methods are also available for parsing the arguments as integers or floats.
 
 [[ `func (parser *ArgParser) ArgsAsFloats() []float64` ]]
 
@@ -116,16 +117,6 @@ Positional arguments are stored as a slice of strings in the parser's `.Args` pr
 
     Attempts to parse and return the positional arguments as a slice of
     integers. Exits with an error message on failure.
-
-
-[[ `func (parser *ArgParser) CountArgs() int` ]]
-
-    Returns the number of positional arguments.
-
-
-[[ `func (parser *ArgParser) HasArgs() bool` ]]
-
-    Returns `true` if at least one positional argument was found.
 
 
 

@@ -241,7 +241,10 @@ Returns the specified string-valued option's list of values.
 Positional Arguments
 </h3>
 <p>
-Positional arguments are stored as a slice of strings in the parser's <code>.Args</code> property.
+Positional arguments (also known as 'free' arguments, i.e. arguments that are not option values) are appended to a slice of strings which can be accessed via the  parser's <code>.Args</code> property.
+</p>
+<p>
+The following convenience methods are also available for parsing the arguments as integers or floats.
 </p>
 <dl>
 <div>
@@ -263,26 +266,6 @@ Exits with an error message on failure.
 <p>
 Attempts to parse and return the positional arguments as a slice of
 integers. Exits with an error message on failure.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) CountArgs() int</code>
-</dt>
-<dd>
-<p>
-Returns the number of positional arguments.
-</p>
-</dd>
-</div>
-<div>
-<dt>
-<code>func (parser *ArgParser) HasArgs() bool</code>
-</dt>
-<dd>
-<p>
-Returns <code>true</code> if at least one positional argument was found.
 </p>
 </dd>
 </div>

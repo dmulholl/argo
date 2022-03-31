@@ -26,6 +26,11 @@ meta_title: Argo &mdash; a simple argument-parsing library for Go
 
 ### Installation
 
+Install the `argo` package:
+
+::: code
+    go get github.com/dmulholl/argo@v0.3.0
+
 Import the `argo` package:
 
 ::: code go
