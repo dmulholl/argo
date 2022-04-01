@@ -14,7 +14,10 @@ meta_title: Argo &mdash; API Reference
     Creates a new `ArgParser` instance.
 
     You can specify `.Helptext` and `.Version` strings for the parser.
-    Specifying a helptext string activates an automatic `--help/-h` flag; similarly, specifying a version string activates an automatic `--version/-v` flag.
+
+    Specifying a helptext string activates an automatic `--help` flag (also a `-h` shortcut unless registered by another option).
+
+    Specifying a version string activates an automatic `--version` flag (also a `-v` shortcut unless registered by another option).
 
 
 
@@ -32,6 +35,9 @@ meta_title: Argo &mdash; API Reference
 
     Registers a new flag.
     The `name` parameter accepts an unlimited number of space-separated aliases and single-character shortcuts.
+
+    A *flag* is a valueless option --- it's either present or absent, but takes no argument.
+    You can check for the presence of a flag using the parser's `.Found()` method.
 
 
 [[ `func (parser *ArgParser) NewFloatOption(name string, fallback float64)` ]]
@@ -58,7 +64,7 @@ meta_title: Argo &mdash; API Reference
 
 ### Retrieving Values
 
-Any of an option's registered aliases or shortcuts can be used for the `name` parameter in the functions below.
+Any of an option's registered aliases or shortcuts can be used for the `name` parameter in the methods below.
 
 [[ `func (parser *ArgParser) Count(name string) int` ]]
 

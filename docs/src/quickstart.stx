@@ -44,9 +44,9 @@ And determine our output filepath:
 ::: code go
     outpath := parser.StringValue("out")
 
-The input filenames will be collected by the parser into a list of positional arguments:
+The input filenames will be collected by the parser into a list of positional arguments --- a slice of strings which we can access via the parser's `.Args` field:
 
 ::: code go
-    for _, filename := range parser.Args() {
+    for _, filename := range parser.Args {
         doStuff()
     }

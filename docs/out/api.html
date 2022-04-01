@@ -77,7 +77,12 @@ Creates a new <code>ArgParser</code> instance.
 </p>
 <p>
 You can specify <code>.Helptext</code> and <code>.Version</code> strings for the parser.
-Specifying a helptext string activates an automatic <code>--help/-h</code> flag; similarly, specifying a version string activates an automatic <code>--version/-v</code> flag.
+</p>
+<p>
+Specifying a helptext string activates an automatic <code>--help</code> flag (also a <code>-h</code> shortcut unless registered by another option).
+</p>
+<p>
+Specifying a version string activates an automatic <code>--version</code> flag (also a <code>-v</code> shortcut unless registered by another option).
 </p>
 </dd>
 </div>
@@ -109,6 +114,10 @@ Registering Flags and Options
 <p>
 Registers a new flag.
 The <code>name</code> parameter accepts an unlimited number of space-separated aliases and single-character shortcuts.
+</p>
+<p>
+A <i>flag</i> is a valueless option &mdash; it's either present or absent, but takes no argument.
+You can check for the presence of a flag using the parser's <code>.Found()</code> method.
 </p>
 </dd>
 </div>
@@ -153,7 +162,7 @@ The <code>fallback</code> parameter specifies the option's default value.
 Retrieving Values
 </h3>
 <p>
-Any of an option's registered aliases or shortcuts can be used for the <code>name</code> parameter in the functions below.
+Any of an option's registered aliases or shortcuts can be used for the <code>name</code> parameter in the methods below.
 </p>
 <dl>
 <div>
