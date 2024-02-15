@@ -1,9 +1,9 @@
 ---
 title: Home
-meta_title: Argo &mdash; a simple argument-parsing library for Go
+meta_title: Argo &mdash; a minimalist argument-parsing library for Go
 ---
 
-**Argo** is a simple Go library for parsing command line arguments.
+**Argo** is a minimalist Go library for parsing command line arguments.
 
 
 
@@ -41,8 +41,8 @@ Import the `argo` package:
 ### Links
 
 * [Github](https://github.com/dmulholl/argo)
-* [Simple Example](https://github.com/dmulholl/argo/blob/master/examples/simple/main.go)
-* [Command Example](https://github.com/dmulholl/argo/blob/master/examples/command/main.go)
+* [Simple Example](https://github.com/dmulholl/argo/blob/master/cmd/simple-example/main.go)
+* [Command Example](https://github.com/dmulholl/argo/blob/master/cmd/command-example/main.go)
 * [API Documentation](https://pkg.go.dev/github.com/dmulholl/argo)
 
 
