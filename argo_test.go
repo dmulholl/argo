@@ -9,7 +9,7 @@ import "testing"
 func TestFlagEmpty(t *testing.T) {
 	parser := NewParser()
 	parser.NewFlag("bool")
-	parser.ParseArgs([]string{})
+	parser.Parse([]string{"ignored"})
 	if parser.Found("bool") != false {
 		t.Fail()
 	}
@@ -21,7 +21,7 @@ func TestFlagEmpty(t *testing.T) {
 func TestFlagMissing(t *testing.T) {
 	parser := NewParser()
 	parser.NewFlag("bool")
-	parser.ParseArgs([]string{"foo", "bar"})
+	parser.Parse([]string{"ignored", "foo", "bar"})
 	if parser.Found("bool") != false {
 		t.Fail()
 	}
@@ -33,7 +33,7 @@ func TestFlagMissing(t *testing.T) {
 func TestFlagLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFlag("bool")
-	parser.ParseArgs([]string{"--bool"})
+	parser.Parse([]string{"ignored", "--bool"})
 	if parser.Found("bool") != true {
 		t.Fail()
 	}
@@ -45,7 +45,7 @@ func TestFlagLongform(t *testing.T) {
 func TestFlagShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFlag("bool b")
-	parser.ParseArgs([]string{"-b"})
+	parser.Parse([]string{"ignored", "-b"})
 	if parser.Found("bool") != true {
 		t.Fail()
 	}
@@ -57,7 +57,7 @@ func TestFlagShortform(t *testing.T) {
 func TestBoolMultiLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFlag("bool")
-	parser.ParseArgs([]string{"--bool", "--bool", "--bool"})
+	parser.Parse([]string{"ignored", "--bool", "--bool", "--bool"})
 	if parser.Found("bool") != true {
 		t.Fail()
 	}
@@ -69,7 +69,7 @@ func TestBoolMultiLongform(t *testing.T) {
 func TestBoolMultiShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFlag("bool b")
-	parser.ParseArgs([]string{"-b", "-b", "-b"})
+	parser.Parse([]string{"ignored", "-b", "-b", "-b"})
 	if parser.Found("bool") != true {
 		t.Fail()
 	}
@@ -85,7 +85,7 @@ func TestBoolMultiShortform(t *testing.T) {
 func TestStringOptionEmpty(t *testing.T) {
 	parser := NewParser()
 	parser.NewStringOption("opt", "default")
-	parser.ParseArgs([]string{})
+	parser.Parse([]string{"ignored"})
 	if parser.StringValue("opt") != "default" {
 		t.Fail()
 	}
@@ -100,7 +100,7 @@ func TestStringOptionEmpty(t *testing.T) {
 func TestStringOptionMissing(t *testing.T) {
 	parser := NewParser()
 	parser.NewStringOption("opt", "default")
-	parser.ParseArgs([]string{"foo", "bar"})
+	parser.Parse([]string{"ignored", "foo", "bar"})
 	if parser.StringValue("opt") != "default" {
 		t.Fail()
 	}
@@ -115,7 +115,7 @@ func TestStringOptionMissing(t *testing.T) {
 func TestStringOptionLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewStringOption("opt", "default")
-	parser.ParseArgs([]string{"--opt", "value"})
+	parser.Parse([]string{"ignored", "--opt", "value"})
 	if parser.StringValue("opt") != "value" {
 		t.Fail()
 	}
@@ -130,7 +130,7 @@ func TestStringOptionLongform(t *testing.T) {
 func TestStringOptionShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewStringOption("opt o", "default")
-	parser.ParseArgs([]string{"-o", "value"})
+	parser.Parse([]string{"ignored", "-o", "value"})
 	if parser.StringValue("opt") != "value" {
 		t.Fail()
 	}
@@ -145,7 +145,7 @@ func TestStringOptionShortform(t *testing.T) {
 func TestStringListLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewStringOption("opt", "default")
-	parser.ParseArgs([]string{"--opt", "a", "b", "--opt", "c"})
+	parser.Parse([]string{"ignored", "--opt", "a", "b", "--opt", "c"})
 	if parser.Found("opt") != true {
 		t.Fail()
 	}
@@ -166,7 +166,7 @@ func TestStringListLongform(t *testing.T) {
 func TestStringListShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewStringOption("opt o", "default")
-	parser.ParseArgs([]string{"-o", "a", "b", "-o", "c"})
+	parser.Parse([]string{"ignored", "-o", "a", "b", "-o", "c"})
 	if parser.Found("opt") != true {
 		t.Fail()
 	}
@@ -191,7 +191,7 @@ func TestStringListShortform(t *testing.T) {
 func TestIntOptionEmpty(t *testing.T) {
 	parser := NewParser()
 	parser.NewIntOption("opt", 101)
-	parser.ParseArgs([]string{})
+	parser.Parse([]string{"ignored"})
 	if parser.IntValue("opt") != 101 {
 		t.Fail()
 	}
@@ -206,7 +206,7 @@ func TestIntOptionEmpty(t *testing.T) {
 func TestIntOptionMissing(t *testing.T) {
 	parser := NewParser()
 	parser.NewIntOption("opt", 101)
-	parser.ParseArgs([]string{"foo", "bar"})
+	parser.Parse([]string{"ignored", "foo", "bar"})
 	if parser.IntValue("opt") != 101 {
 		t.Fail()
 	}
@@ -221,7 +221,7 @@ func TestIntOptionMissing(t *testing.T) {
 func TestIntOptionLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewIntOption("opt", 101)
-	parser.ParseArgs([]string{"--opt", "202"})
+	parser.Parse([]string{"ignored", "--opt", "202"})
 	if parser.IntValue("opt") != 202 {
 		t.Fail()
 	}
@@ -236,7 +236,7 @@ func TestIntOptionLongform(t *testing.T) {
 func TestIntOptionShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewIntOption("opt o", 101)
-	parser.ParseArgs([]string{"-o", "202"})
+	parser.Parse([]string{"ignored", "-o", "202"})
 	if parser.IntValue("opt") != 202 {
 		t.Fail()
 	}
@@ -251,7 +251,7 @@ func TestIntOptionShortform(t *testing.T) {
 func TestIntOptionNegative(t *testing.T) {
 	parser := NewParser()
 	parser.NewIntOption("opt", 101)
-	parser.ParseArgs([]string{"--opt", "-202"})
+	parser.Parse([]string{"ignored", "--opt", "-202"})
 	if parser.IntValue("opt") != -202 {
 		t.Fail()
 	}
@@ -266,7 +266,7 @@ func TestIntOptionNegative(t *testing.T) {
 func TestIntListLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewIntOption("opt", 101)
-	parser.ParseArgs([]string{"--opt", "1", "2", "--opt", "3"})
+	parser.Parse([]string{"ignored", "--opt", "1", "2", "--opt", "3"})
 	if parser.Found("opt") != true {
 		t.Fail()
 	}
@@ -287,7 +287,7 @@ func TestIntListLongform(t *testing.T) {
 func TestIntListShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewIntOption("opt o", 101)
-	parser.ParseArgs([]string{"-o", "1", "2", "-o", "3"})
+	parser.Parse([]string{"ignored", "-o", "1", "2", "-o", "3"})
 	if parser.Found("opt") != true {
 		t.Fail()
 	}
@@ -312,7 +312,7 @@ func TestIntListShortform(t *testing.T) {
 func TestFloatOptionEmpty(t *testing.T) {
 	parser := NewParser()
 	parser.NewFloatOption("opt", 1.1)
-	parser.ParseArgs([]string{})
+	parser.Parse([]string{"ignored"})
 	if parser.FloatValue("opt") != 1.1 {
 		t.Fail()
 	}
@@ -327,7 +327,7 @@ func TestFloatOptionEmpty(t *testing.T) {
 func TestFloatOptionMissing(t *testing.T) {
 	parser := NewParser()
 	parser.NewFloatOption("opt", 1.1)
-	parser.ParseArgs([]string{"foo", "bar"})
+	parser.Parse([]string{"ignored", "foo", "bar"})
 	if parser.FloatValue("opt") != 1.1 {
 		t.Fail()
 	}
@@ -342,7 +342,7 @@ func TestFloatOptionMissing(t *testing.T) {
 func TestFloatOptionLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFloatOption("opt", 1.1)
-	parser.ParseArgs([]string{"--opt", "2.2"})
+	parser.Parse([]string{"ignored", "--opt", "2.2"})
 	if parser.FloatValue("opt") != 2.2 {
 		t.Fail()
 	}
@@ -357,7 +357,7 @@ func TestFloatOptionLongform(t *testing.T) {
 func TestFloatOptionShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFloatOption("opt o", 1.1)
-	parser.ParseArgs([]string{"-o", "2.2"})
+	parser.Parse([]string{"ignored", "-o", "2.2"})
 	if parser.FloatValue("opt") != 2.2 {
 		t.Fail()
 	}
@@ -372,7 +372,7 @@ func TestFloatOptionShortform(t *testing.T) {
 func TestFloatOptionNegative(t *testing.T) {
 	parser := NewParser()
 	parser.NewFloatOption("opt", 1.1)
-	parser.ParseArgs([]string{"--opt", "-2.2"})
+	parser.Parse([]string{"ignored", "--opt", "-2.2"})
 	if parser.FloatValue("opt") != -2.2 {
 		t.Fail()
 	}
@@ -387,7 +387,7 @@ func TestFloatOptionNegative(t *testing.T) {
 func TestFloatListLongform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFloatOption("opt", 0.0)
-	parser.ParseArgs([]string{"--opt", "1.0", "2.0", "--opt", "3.0"})
+	parser.Parse([]string{"ignored", "--opt", "1.0", "2.0", "--opt", "3.0"})
 	if parser.Found("opt") != true {
 		t.Fail()
 	}
@@ -405,7 +405,7 @@ func TestFloatListLongform(t *testing.T) {
 func TestFloatListShortform(t *testing.T) {
 	parser := NewParser()
 	parser.NewFloatOption("opt o", 0.0)
-	parser.ParseArgs([]string{"-o", "1.0", "2.0", "-o", "3.0"})
+	parser.Parse([]string{"ignored", "-o", "1.0", "2.0", "-o", "3.0"})
 	if parser.Found("opt") != true {
 		t.Fail()
 	}
@@ -434,7 +434,7 @@ func TestMultiOptionsEmpty(t *testing.T) {
 	parser.NewIntOption("int2 i", 202)
 	parser.NewFloatOption("float1", 1.1)
 	parser.NewFloatOption("float2 f", 2.2)
-	parser.ParseArgs([]string{})
+	parser.Parse([]string{"ignored"})
 	if parser.Found("bool1") != false {
 		t.Fail()
 	}
@@ -471,7 +471,8 @@ func TestMultiOptionsLongform(t *testing.T) {
 	parser.NewIntOption("int2 i", 202)
 	parser.NewFloatOption("float1", 1.1)
 	parser.NewFloatOption("float2 f", 2.2)
-	parser.ParseArgs([]string{
+	parser.Parse([]string{
+		"ignored",
 		"--bool1",
 		"--bool2",
 		"--string1", "value1",
@@ -517,7 +518,8 @@ func TestMultiOptionsShortform(t *testing.T) {
 	parser.NewIntOption("int2 i", 202)
 	parser.NewFloatOption("float1", 1.1)
 	parser.NewFloatOption("float2 f", 2.2)
-	parser.ParseArgs([]string{
+	parser.Parse([]string{
+		"ignored",
 		"--bool1",
 		"-b",
 		"--string1", "value1",
@@ -563,7 +565,7 @@ func TestCondensedOptions(t *testing.T) {
 	parser.NewStringOption("string s", "default")
 	parser.NewIntOption("int i", 101)
 	parser.NewFloatOption("float f", 1.1)
-	parser.ParseArgs([]string{"-bsif", "value", "202", "2.2"})
+	parser.Parse([]string{"ignored", "-bsif", "value", "202", "2.2"})
 	if parser.Found("bool") != true {
 		t.Fail()
 	}
@@ -584,19 +586,16 @@ func TestCondensedOptions(t *testing.T) {
 
 func TestPositionalArgsEmpty(t *testing.T) {
 	parser := NewParser()
-	parser.ParseArgs([]string{})
-	if parser.HasArgs() != false {
+	parser.Parse([]string{"ignored"})
+	if len(parser.Args) != 0 {
 		t.Fail()
 	}
 }
 
 func TestPositionalArgs(t *testing.T) {
 	parser := NewParser()
-	parser.ParseArgs([]string{"foo", "bar"})
-	if parser.HasArgs() != true {
-		t.Fail()
-	}
-	if parser.CountArgs() != 2 {
+	parser.Parse([]string{"ignored", "foo", "bar"})
+	if len(parser.Args) != 2 {
 		t.Fail()
 	}
 	if parser.Args[0] != "foo" {
@@ -609,28 +608,36 @@ func TestPositionalArgs(t *testing.T) {
 
 func TestPositionalArgsAsInts(t *testing.T) {
 	parser := NewParser()
-	parser.ParseArgs([]string{"1", "11"})
-	if len(parser.ArgsAsInts()) != 2 {
+	parser.Parse([]string{"ignored", "123", "456"})
+	argsAsInts, err := parser.ArgsAsInts()
+	if err != nil {
 		t.Fail()
 	}
-	if parser.ArgsAsInts()[0] != 1 {
+	if len(argsAsInts) != 2 {
 		t.Fail()
 	}
-	if parser.ArgsAsInts()[1] != 11 {
+	if argsAsInts[0] != 123 {
+		t.Fail()
+	}
+	if argsAsInts[1] != 456 {
 		t.Fail()
 	}
 }
 
 func TestPositionalArgsAsFloats(t *testing.T) {
 	parser := NewParser()
-	parser.ParseArgs([]string{"1.1", "11.1"})
-	if len(parser.ArgsAsFloats()) != 2 {
+	parser.Parse([]string{"ignored", "1.0", "123.456"})
+	argsAsFloats, err := parser.ArgsAsFloats()
+	if err != nil {
 		t.Fail()
 	}
-	if parser.ArgsAsFloats()[0] != 1.1 {
+	if len(argsAsFloats) != 2 {
 		t.Fail()
 	}
-	if parser.ArgsAsFloats()[1] != 11.1 {
+	if argsAsFloats[0] != 1.0 {
+		t.Fail()
+	}
+	if argsAsFloats[1] != 123.456 {
 		t.Fail()
 	}
 }
@@ -642,8 +649,11 @@ func TestPositionalArgsAsFloats(t *testing.T) {
 func TestCommandAbsent(t *testing.T) {
 	parser := NewParser()
 	parser.NewCommand("cmd")
-	parser.ParseArgs([]string{})
-	if parser.HasCommand() != false {
+	parser.Parse([]string{"ignored"})
+	if parser.FoundCommandName != "" {
+		t.Fail()
+	}
+	if parser.FoundCommandParser != nil {
 		t.Fail()
 	}
 }
@@ -651,14 +661,11 @@ func TestCommandAbsent(t *testing.T) {
 func TestCommandPresent(t *testing.T) {
 	parser := NewParser()
 	cmdParser := parser.NewCommand("cmd")
-	parser.ParseArgs([]string{"cmd"})
-	if parser.HasCommand() != true {
+	parser.Parse([]string{"ignored", "cmd"})
+	if parser.FoundCommandName != "cmd" {
 		t.Fail()
 	}
-	if parser.CommandName() != "cmd" {
-		t.Fail()
-	}
-	if parser.CommandParser() != cmdParser {
+	if parser.FoundCommandParser != cmdParser {
 		t.Fail()
 	}
 }
@@ -670,26 +677,21 @@ func TestCommandWithOptions(t *testing.T) {
 	cmdParser.NewStringOption("string", "default")
 	cmdParser.NewIntOption("int", 101)
 	cmdParser.NewFloatOption("float", 1.1)
-	parser.ParseArgs([]string{
+	parser.Parse([]string{
+		"ignored",
 		"cmd",
 		"foo", "bar",
 		"--string", "value",
 		"--int", "202",
 		"--float", "2.2",
 	})
-	if parser.HasCommand() != true {
+	if parser.FoundCommandName != "cmd" {
 		t.Fail()
 	}
-	if parser.CommandName() != "cmd" {
+	if parser.FoundCommandParser != cmdParser {
 		t.Fail()
 	}
-	if parser.CommandParser() != cmdParser {
-		t.Fail()
-	}
-	if cmdParser.HasArgs() != true {
-		t.Fail()
-	}
-	if cmdParser.CountArgs() != 2 {
+	if len(cmdParser.Args) != 2 {
 		t.Fail()
 	}
 	if cmdParser.StringValue("string") != "value" {
