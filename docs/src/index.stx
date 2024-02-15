@@ -29,7 +29,7 @@ meta_title: Argo &mdash; a simple argument-parsing library for Go
 Install the `argo` package:
 
 ::: code
-    go get github.com/dmulholl/argo@v0.3.0
+    go get github.com/dmulholl/argo
 
 Import the `argo` package:
 
@@ -43,6 +43,7 @@ Import the `argo` package:
 * [Github](https://github.com/dmulholl/argo)
 * [Simple Example](https://github.com/dmulholl/argo/blob/master/examples/simple/main.go)
 * [Command Example](https://github.com/dmulholl/argo/blob/master/examples/command/main.go)
+* [API Documentation](https://pkg.go.dev/github.com/dmulholl/argo)
 
 
 

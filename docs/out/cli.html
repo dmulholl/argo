@@ -4,10 +4,17 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Argo &mdash; Command Line Interface</title>
+
+        
+
         <link rel="stylesheet" href="assets/fonts.css">
         <link rel="stylesheet" href="assets/graphite.css">
         <link rel="stylesheet" href="assets/pygments.css">
+
         
+            <script src="assets/code.js"></script>
+        
+
         
     </head>
     <body class="node-cli node">
@@ -17,7 +24,7 @@
                 <p class="tagline">An argument-parsing library for Go.</p>
             
             
-                <p class="version">Version 0.3.0</p>
+                <p class="version">Version 4.3.0-alpha</p>
             
             <nav class="menu">
                 <input id="menu-check" type="checkbox"/>
@@ -30,12 +37,13 @@
 <li><a href="index.html">Home</a></li>
 <li><a href="quickstart.html">Quickstart</a></li>
 <li><a href="cli.html">CLI</a></li>
-<li><a href="api.html">API</a></li>
+<li><a href="https://pkg.go.dev/github.com/dmulholl/argo">API</a></li>
 <li><a href="license.html">License</a></li>
 <li><a href="https://github.com/dmulholl/argo">Github</a></li>
 </ul>
             </nav>
         </header>
+
         <article class="main">
             <header class="title">
                 <h1>Command Line Interface</h1>
@@ -119,10 +127,10 @@ Quoted Values
 Note that you can use quotes to surround argument and option values containing spaces, e.g.
 </p>
 <pre>
-$ my_app &quot;arg 1&quot; &quot;arg 2&quot;
-$ my_app --option &quot;value with spaces&quot;
-$ my_app --option=&quot;value with spaces&quot;
-$ my_app -o=&quot;value with spaces&quot;
+$ my_app "arg 1" "arg 2"
+$ my_app --option "value with spaces"
+$ my_app --option="value with spaces"
+$ my_app -o="value with spaces"
 </pre>
 <p>
 This isn't a feature of the library &mdash; the quotes are processed by the shell and the library only sees the resulting string values, including spaces.
@@ -152,6 +160,7 @@ Negative Numbers
 Some argument-parsing libraries struggle with negative numbers &mdash; for example, they will try to parse <code>-3</code> as a flag or option named <code>3</code>. This library always treats arguments beginning with a dash and a digit as positional arguments or option values, never as flag or option names.
 </p>
         </article>
+
         
     </body>
 </html>
