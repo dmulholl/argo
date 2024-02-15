@@ -3,7 +3,7 @@ title: Quickstart Tutorial
 meta_title: Argo &mdash; Quickstart Tutorial
 ---
 
-Imagine we're building a utility for joining MP3 files, something like [MP3cat](https://github.com/dmulholl/mp3cat).
+Imagine we're building a utility for joining MP3 files.
 We want the user to supply the file names as a list of command line arguments.
 We also want to support an `--out/-o` option so the user can specify an output filename and a `--quiet/-q` flag for turning down the program's verbosity.
 
