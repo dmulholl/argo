@@ -10,11 +10,6 @@ import (
 	"unicode"
 )
 
-func exit(message string) {
-	fmt.Fprintf(os.Stderr, "Error: %v.\n", message)
-	os.Exit(1)
-}
-
 /* --------- */
 /*  Options  */
 /* --------- */
@@ -32,24 +27,30 @@ type option struct {
 }
 
 // This method attempts to set the option's value by parsing a string argument.
-func (opt *option) trySetValue(arg string) {
+func (opt *option) trySetValue(arg string) error {
 	switch opt.kind {
 	case "string":
 		opt.stringValues = append(opt.stringValues, arg)
+		return nil
 
 	case "int":
 		value, err := strconv.ParseInt(arg, 0, 0)
 		if err != nil {
-			exit(fmt.Sprintf("cannot parse '%v' as an integer", arg))
+			return fmt.Errorf("cannot parse '%s' as an integer", arg)
 		}
 		opt.intValues = append(opt.intValues, int(value))
+		return nil
 
 	case "float":
 		value, err := strconv.ParseFloat(arg, 64)
 		if err != nil {
-			exit(fmt.Sprintf("cannot parse '%v' as a float", arg))
+			return fmt.Errorf("cannot parse '%s' as a float", arg)
 		}
 		opt.floatValues = append(opt.floatValues, value)
+		return nil
+
+	default:
+		panic(fmt.Sprintf("argo: invalid option type: %s", opt.kind))
 	}
 }
 
@@ -90,29 +91,48 @@ func (stream *argstream) hasNext() bool {
 
 // An ArgParser instance stores registered options and commands.
 type ArgParser struct {
-	// Help text for the application or command.
+	// The parser's helptext string.
+	//
+	// Specifying a helptext string for a parser activates an automatic --help flag that prints the
+	// parser's helptext and exits. (Also activates an automatic -h shortcut unless registered by
+	// another flag/option.)
 	Helptext string
 
-	// The application's version number.
+	// The parser's version string.
+	//
+	// Specifying a version string for a parser activates an automatic --version flag that prints the
+	// parser's version and exits. (Also activates an automatic -v shortcut unless registered
+	// by another flag/option.)
 	Version string
 
-	// Stores positional arguments.
+	// The parser's callback function.
+	//
+	// This field is only valid for command subparsers. If the command subparser's registered
+	// command is found by the parent parser, and if this field is not nil, the specified callback
+	// function will be called automatically. It will be passed the command name and the command's
+	// ArgParser instance as arguments.
+	Callback func(string, *ArgParser) error
+
+	// If true, enables an automatic 'help' command that prints helptext for subcommands.
+	//
+	// Defaults to false but gets toggled automatically to true whenever a command is registered.
+	// Set this value to false to disable the automatic 'help' command.
+	EnableHelpCommand bool
+
+	// After parsing, stores the parser's positional arguments.
 	Args []string
+
+	// After parsing, if the parser has found a command, stores the command's name.
+	FoundCommandName string
+
+	// After parsing, if the parser has found a command, stores the command's ArgParser instance.
+	FoundCommandParser *ArgParser
 
 	// Stores option instances indexed by option name.
 	options map[string]*option
 
 	// Stores command parsers indexed by command name.
 	commands map[string]*ArgParser
-
-	// Stores the callback function for a command parser.
-	Callback func(string, *ArgParser)
-
-	// Stores the command name, if a command was found while parsing.
-	command string
-
-	// If true, enables an automatic 'help' command to print subcommand helptext.
-	enableHelpCommand bool
 }
 
 // NewParser initializes a new ArgParser instance.
@@ -128,8 +148,12 @@ func NewParser() *ArgParser {
 /*  ArgParser: register options.  */
 /* ------------------------------ */
 
-// NewFlag registers a new flag. The `name` parameter accepts an unlimited number of
-// space-separated aliases and single-character shortcuts.
+// NewFlag registers a new flag, i.e. a valueless option that is either present (found) or absent
+// (not found). You can check for the presence of a flag using the parser's Found() or Count()
+// methods.
+//
+// The name parameter accepts an unlimited number of space-separated aliases and single-character
+// shortcuts.
 func (parser *ArgParser) NewFlag(name string) {
 	opt := &option{}
 	opt.kind = "flag"
@@ -138,9 +162,10 @@ func (parser *ArgParser) NewFlag(name string) {
 	}
 }
 
-// NewStringOption registers a new string-valued option. The `name` parameter accepts an unlimited
-// number of space-separated aliases and single-character shortcuts. The `fallback` parameter
-// specifies the option's default value.
+// NewStringOption registers a new string-valued option.
+//
+// The name parameter accepts an unlimited number of space-separated aliases and single-character
+// shortcuts. The fallback parameter specifies the option's default value.
 func (parser *ArgParser) NewStringOption(name string, fallback string) {
 	opt := &option{}
 	opt.kind = "string"
@@ -150,9 +175,11 @@ func (parser *ArgParser) NewStringOption(name string, fallback string) {
 	}
 }
 
-// NewIntOption registers a new integer-valued option. The `name` parameter accepts an unlimited
-// number of space-separated aliases and single-character shortcuts. The `fallback` parameter
-// specifies the option's default value.
+// NewIntOption registers a new integer-valued option, i.e. the option's value will be parsed
+// as an int.
+//
+// The name parameter accepts an unlimited number of space-separated aliases and single-character
+// shortcuts. The fallback parameter specifies the option's default value.
 func (parser *ArgParser) NewIntOption(name string, fallback int) {
 	opt := &option{}
 	opt.kind = "int"
@@ -162,9 +189,11 @@ func (parser *ArgParser) NewIntOption(name string, fallback int) {
 	}
 }
 
-// NewFloatOption registers a new float-valued option. The `name` parameter accepts an unlimited
-// number of space-separated aliases and single-character shortcuts. The `fallback` parameter
-// specifies the option's default value.
+// NewFloatOption registers a new float-valued option, i.e. the option's value will be parsed
+// as a float64.
+//
+// The name parameter accepts an unlimited number of space-separated aliases and single-character
+// shortcuts. The fallback parameter specifies the option's default value.
 func (parser *ArgParser) NewFloatOption(name string, fallback float64) {
 	opt := &option{}
 	opt.kind = "float"
@@ -182,20 +211,29 @@ func (parser *ArgParser) getOpt(name string) *option {
 	if opt, found := parser.options[name]; found {
 		return opt
 	}
-	panic(fmt.Sprintf("argo: invalid option name '%s'", name))
+	panic(fmt.Sprintf("argo: '%s' is not a registered flag or option name", name))
 }
 
-// Count returns the number of times the specified option was found.
+// Count returns the number of times the specified flag or option was found.
+// Any of the flag/option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) Count(name string) int {
 	return parser.getOpt(name).count
 }
 
-// Found returns true if the specified option was found.
+// Found returns true if the specified flag or option was found.
+// Any of the flag/option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) Found(name string) bool {
 	return parser.getOpt(name).count > 0
 }
 
 // StringValue returns the value of the specified string-valued option.
+// Any of the option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) StringValue(name string) string {
 	opt := parser.getOpt(name)
 	if len(opt.stringValues) > 0 {
@@ -206,6 +244,9 @@ func (parser *ArgParser) StringValue(name string) string {
 }
 
 // IntValue returns the value of the specified integer-valued option.
+// Any of the option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) IntValue(name string) int {
 	opt := parser.getOpt(name)
 	if len(opt.intValues) > 0 {
@@ -216,6 +257,9 @@ func (parser *ArgParser) IntValue(name string) int {
 }
 
 // FloatValue returns the value of the specified float-valued option.
+// Any of the option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) FloatValue(name string) float64 {
 	opt := parser.getOpt(name)
 	if len(opt.floatValues) > 0 {
@@ -226,16 +270,25 @@ func (parser *ArgParser) FloatValue(name string) float64 {
 }
 
 // StringValues returns the specified string-valued option's list of values.
+// Any of the option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) StringValues(name string) []string {
 	return parser.getOpt(name).stringValues
 }
 
 // IntValues returns the specified integer-valued option's list of values.
+// Any of the option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) IntValues(name string) []int {
 	return parser.getOpt(name).intValues
 }
 
 // FloatValues returns the specified float-valued option's list of values.
+// Any of the option's registered aliases or shortcuts can be used as the name parameter.
+//
+// Panics if name is not a registered flag or option name.
 func (parser *ArgParser) FloatValues(name string) []float64 {
 	return parser.getOpt(name).floatValues
 }
@@ -244,52 +297,42 @@ func (parser *ArgParser) FloatValues(name string) []float64 {
 /*  ArgParser: positional arguments.  */
 /* ---------------------------------- */
 
-// HasArgs returns true if the parser has found one or more positional arguments.
-func (parser *ArgParser) HasArgs() bool {
-	return len(parser.Args) > 0
-}
-
-// CountArgs returns the number of positional arguments.
-func (parser *ArgParser) CountArgs() int {
-	return len(parser.Args)
-}
-
-// ArgsAsInts attempts to parse and return the positional arguments as a slice of integers. Exits
-// with an error message if any of the arguments cannot be parsed as an integer.
-func (parser *ArgParser) ArgsAsInts() []int {
+// ArgsAsInts attempts to return the parser's positional arguments as a slice of integers.
+// Returns an error if any of the arguments cannot be parsed as an integer.
+func (parser *ArgParser) ArgsAsInts() ([]int, error) {
 	values := make([]int, 0)
 	for _, arg := range parser.Args {
 		value, err := strconv.ParseInt(arg, 0, 0)
 		if err != nil {
-			exit(fmt.Sprintf("cannot parse '%v' as an integer", arg))
+			return nil, fmt.Errorf("cannot parse '%v' as an integer", arg)
 		}
 		values = append(values, int(value))
 	}
-	return values
+	return values, nil
 }
 
-// ArgsAsFloats attempts to parse and return the positional arguments as a slice of floats. Exits
-// with an error message if any of the arguments cannot be parsed as a float.
-func (parser *ArgParser) ArgsAsFloats() []float64 {
+// ArgsAsFloats attempts to return the parser's positional arguments as a slice of floats.
+// Returns an error if any of the arguments cannot be parsed as a float.
+func (parser *ArgParser) ArgsAsFloats() ([]float64, error) {
 	values := make([]float64, 0)
 	for _, arg := range parser.Args {
 		value, err := strconv.ParseFloat(arg, 64)
 		if err != nil {
-			exit(fmt.Sprintf("cannot parse '%v' as a float", arg))
+			return nil, fmt.Errorf("cannot parse '%v' as a float", arg)
 		}
 		values = append(values, value)
 	}
-	return values
+	return values, nil
 }
 
 /* ---------------------- */
 /*  ArgParser: commands.  */
 /* ---------------------- */
 
-// NewCommand registers a new command. The `name` parameter accepts an unlimited number of space-
-// separated aliases for the command. Returns the command's `ArgParser` instance.
+// NewCommand registers a new command. The name parameter accepts an unlimited number of space-
+// separated aliases for the command. Returns the new command's ArgParser instance.
 func (parser *ArgParser) NewCommand(name string) *ArgParser {
-	parser.enableHelpCommand = true
+	parser.EnableHelpCommand = true
 	cmdParser := NewParser()
 	for _, alias := range strings.Split(name, " ") {
 		parser.commands[alias] = cmdParser
@@ -297,37 +340,12 @@ func (parser *ArgParser) NewCommand(name string) *ArgParser {
 	return cmdParser
 }
 
-// HasCommand returns true if the parser has found a command.
-func (parser *ArgParser) HasCommand() bool {
-	return parser.command != ""
-}
-
-// CommandName returns the command name, if the parser has found a command.
-func (parser *ArgParser) CommandName() string {
-	return parser.command
-}
-
-// CommandParser returns the command's parser instance, if the parser has found a command.
-func (parser *ArgParser) CommandParser() *ArgParser {
-	return parser.commands[parser.command]
-}
-
-// This boolean switch toggles support for an automatic `help` command which prints subcommand
-// helptext. The value defaults to `false` but gets toggled automatically to true whenever a command
-// is registered. You can use this method to disable the feature if required.
-func (parser *ArgParser) EnableHelpCommand(enable bool) {
-	parser.enableHelpCommand = enable
-}
-
 /* ----------------------------- */
 /*  ArgParser: parse arguments.  */
 /* ----------------------------- */
 
-// Parse a stream of string arguments.
-func (parser *ArgParser) parseStream(stream *argstream) {
-	isFirstArg := true
-
-	// Loop while we have arguments to process.
+// Parses a stream of string arguments.
+func (parser *ArgParser) parseStream(stream *argstream) error {
 	for stream.hasNext() {
 		arg := stream.next()
 
@@ -336,12 +354,14 @@ func (parser *ArgParser) parseStream(stream *argstream) {
 			for stream.hasNext() {
 				parser.Args = append(parser.Args, stream.next())
 			}
-			break
+			return nil
 		}
 
 		// Is the argument a long-form option or flag?
 		if strings.HasPrefix(arg, "--") {
-			parser.parseLongOption(arg[2:], stream)
+			if err := parser.parseLongOption(arg[2:], stream); err != nil {
+				return err
+			}
 			continue
 		}
 
@@ -350,128 +370,149 @@ func (parser *ArgParser) parseStream(stream *argstream) {
 			if arg == "-" || unicode.IsDigit([]rune(arg)[1]) {
 				parser.Args = append(parser.Args, arg)
 			} else {
-				parser.parseShortOption(arg[1:], stream)
+				if err := parser.parseShortOption(arg[1:], stream); err != nil {
+					return err
+				}
 			}
 			continue
 		}
 
 		// Is the argument a registered command?
-		if isFirstArg {
+		if len(parser.Args) == 0 {
 			if cmdParser, found := parser.commands[arg]; found {
-				parser.command = arg
-				cmdParser.parseStream(stream)
-				if cmdParser.Callback != nil {
-					cmdParser.Callback(arg, cmdParser)
+				parser.FoundCommandName = arg
+				parser.FoundCommandParser = cmdParser
+
+				if err := cmdParser.parseStream(stream); err != nil {
+					return err
 				}
+
+				if cmdParser.Callback != nil {
+					return cmdParser.Callback(arg, cmdParser)
+				}
+
 				break
 			}
 		}
 
 		// Is the argument the automatic 'help' command?
-		if isFirstArg && parser.enableHelpCommand && arg == "help" {
+		if len(parser.Args) == 0 && parser.EnableHelpCommand && arg == "help" {
 			if stream.hasNext() {
 				name := stream.next()
 				if cmdParser, ok := parser.commands[name]; ok {
-					cmdParser.ExitWithHelptext()
-				} else {
-					exit(fmt.Sprintf("'%v' is not a recognised command name", name))
+					cmdParser.exitWithHelptext()
 				}
-			} else {
-				exit("the help command requires an argument")
+				return fmt.Errorf("help: '%v' is not a recognised command name", name)
 			}
+			return fmt.Errorf("help: missing argument for the help command")
 		}
 
 		// If we get here, we have a positional argument.
 		parser.Args = append(parser.Args, arg)
-		isFirstArg = false
 	}
+
+	return nil
 }
 
-// ParseArgs parses a slice of string arguments.
-func (parser *ArgParser) ParseArgs(args []string) {
-	parser.parseStream(newArgStream(args))
+// Parse parses a slice of string arguments. The arguments will be treated as if they came directly
+// from os.Args, i.e. the first argument will be treated as the application's path and will be ignored.
+func (parser *ArgParser) Parse(args []string) error {
+	return parser.parseStream(newArgStream(args[1:]))
 }
 
-// Parse parses the application's command line arguments.
-func (parser *ArgParser) Parse() {
-	parser.ParseArgs(os.Args[1:])
+// ParseOsArgs parses the application's command line arguments.
+// This is a shortcut for calling Parse(os.Args).
+func (parser *ArgParser) ParseOsArgs() error {
+	return parser.Parse(os.Args)
 }
 
 // Parse a long-form option, i.e. an option beginning with a double dash.
-func (parser *ArgParser) parseLongOption(arg string, stream *argstream) {
+func (parser *ArgParser) parseLongOption(arg string, stream *argstream) error {
 	// Do we have an option of the form --name=value?
 	if strings.Contains(arg, "=") {
-		parser.parseEqualsOption("--", arg)
-		return
+		return parser.parseEqualsOption("--", arg)
 	}
 
-	// Is the argument a registered option name?
+	// Is the argument a registered flag or option name?
 	if opt, found := parser.options[arg]; found {
 		opt.count += 1
-		if opt.kind == "string" || opt.kind == "int" || opt.kind == "float" {
-			if stream.hasNext() {
-				opt.trySetValue(stream.next())
-			} else {
-				exit(fmt.Sprintf("missing argument for --%v", arg))
-			}
+		if opt.kind == "flag" {
+			return nil
 		}
-		return
+		if stream.hasNext() {
+			return opt.trySetValue(stream.next())
+		}
+		return fmt.Errorf("missing argument for option --%v", arg)
 	}
 
 	// Is the argument an automatic --help flag?
 	if arg == "help" && parser.Helptext != "" {
-		parser.ExitWithHelptext()
+		parser.exitWithHelptext()
 	}
 
 	// Is the argument an automatic --version flag?
 	if arg == "version" && parser.Version != "" {
-		parser.ExitWithVersion()
+		parser.exitWithVersion()
 	}
 
-	// The argument is not a recognised option name.
-	exit(fmt.Sprintf("--%v is not a recognised option name", arg))
+	// The argument is not a recognised flag or option name.
+	return fmt.Errorf("--%v is not a recognised flag or option name", arg)
 }
 
 // Parse a short-form option, i.e. an option beginning with a single dash.
-func (parser *ArgParser) parseShortOption(arg string, stream *argstream) {
+func (parser *ArgParser) parseShortOption(arg string, stream *argstream) error {
 	// Do we have an option of the form -n=value?
 	if strings.Contains(arg, "=") {
-		parser.parseEqualsOption("-", arg)
-		return
+		return parser.parseEqualsOption("-", arg)
 	}
 
 	// We examine each character individually to support condensed options with trailing arguments,
-	// e.g. -abc foo bar. If we don't recognise the character as a registered option name, we check
-	// for an automatic -h or -v flag before exiting.
+	// e.g. -abc foo bar. If we don't recognise the character as a registered flag or option name,
+	// we check for an automatic -h or -v flag before returning an error.
 	for _, char := range arg {
 		name := string(char)
+
 		if opt, found := parser.options[name]; found {
 			opt.count += 1
-			if opt.kind == "string" || opt.kind == "int" || opt.kind == "float" {
-				if stream.hasNext() {
-					opt.trySetValue(stream.next())
-				} else if len([]rune(arg)) > 1 {
-					exit(fmt.Sprintf("missing argument for '%v' in -%v", name, arg))
-				} else {
-					exit(fmt.Sprintf("missing argument for -%v", arg))
+			if opt.kind == "flag" {
+				continue
+			}
+			if stream.hasNext() {
+				if err := opt.trySetValue(stream.next()); err != nil {
+					return err
 				}
+				continue
 			}
-		} else {
-			if name == "h" && parser.Helptext != "" {
-				parser.ExitWithHelptext()
-			} else if name == "v" && parser.Version != "" {
-				parser.ExitWithVersion()
-			} else if len([]rune(arg)) > 1 {
-				exit(fmt.Sprintf("'%v' in -%v is not a recognised option name", name, arg))
-			} else {
-				exit(fmt.Sprintf("-%v is not a recognised option name", name))
+			if len([]rune(arg)) > 1 {
+				return fmt.Errorf("missing argument for option '%v' in -%v", name, arg)
 			}
+			return fmt.Errorf("missing argument for option -%v", arg)
 		}
+
+		if name == "h" && parser.Helptext != "" {
+			parser.exitWithHelptext()
+		}
+
+		if name == "v" && parser.Version != "" {
+			parser.exitWithVersion()
+		}
+
+		if len([]rune(arg)) > 1 {
+			return fmt.Errorf("'%v' in -%v is not a recognised flag or option name", name, arg)
+		}
+
+		return fmt.Errorf("-%v is not a recognised flag or option name", name)
 	}
+
+	return nil
 }
 
 // Parse an option of the form --name=value or -n=value.
-func (parser *ArgParser) parseEqualsOption(prefix string, arg string) {
+func (parser *ArgParser) parseEqualsOption(prefix string, arg string) error {
+	if !strings.Contains(arg, "=") {
+		panic(fmt.Sprintf("argo: invalid call to parseEqualsOption with prefix '%s' and arg '%s'", prefix, arg))
+	}
+
 	split := strings.SplitN(arg, "=", 2)
 	name := split[0]
 	value := split[1]
@@ -479,41 +520,41 @@ func (parser *ArgParser) parseEqualsOption(prefix string, arg string) {
 	// Do we have the name of a registered option?
 	opt, found := parser.options[name]
 	if !found {
-		exit(fmt.Sprintf("%s%s is not a recognised option name", prefix, name))
+		return fmt.Errorf("%s%s is not a recognised option name", prefix, name)
 	}
 	opt.count += 1
 
-	// Boolean flags should never contain an equals sign.
+	// Boolean flags should never be followed by an equals sign.
 	if opt.kind == "flag" {
-		exit(fmt.Sprintf("invalid format for flag %s%s", prefix, name))
+		return fmt.Errorf("invalid value assignment for flag %s%s", prefix, name)
 	}
 
 	// Check that a value has been supplied.
 	if value == "" {
-		exit(fmt.Sprintf("missing value for %s%s", prefix, name))
+		return fmt.Errorf("missing value for %s%s", prefix, name)
 	}
 
 	// Try to parse the argument as a value of the appropriate type.
-	opt.trySetValue(value)
+	return opt.trySetValue(value)
 }
 
 // -------------------------------------------------------------------------
 // ArgParser: utilities.
 // -------------------------------------------------------------------------
 
-// ExitWithHelptext prints the parser's help text, then exits.
-func (parser *ArgParser) ExitWithHelptext() {
+// exitWithHelptext prints the parser's help text, then exits.
+func (parser *ArgParser) exitWithHelptext() {
 	fmt.Println(strings.TrimSpace(parser.Helptext))
 	os.Exit(0)
 }
 
-// ExitWithVersion prints the parser's version string, then exits.
-func (parser *ArgParser) ExitWithVersion() {
+// exitWithVersion prints the parser's version string, then exits.
+func (parser *ArgParser) exitWithVersion() {
 	fmt.Println(strings.TrimSpace(parser.Version))
 	os.Exit(0)
 }
 
-// String returns a string representation of the parser instance.
+// String returns a string representation of the parser instance for debugging.
 func (parser *ArgParser) String() string {
 	lines := make([]string, 0)
 
@@ -537,7 +578,7 @@ func (parser *ArgParser) String() string {
 			case "float":
 				values = fmt.Sprintf("(%v) %v", opt.floatFallback, opt.floatValues)
 			}
-			lines = append(lines, fmt.Sprintf("  %v: %v", name, values))
+			lines = append(lines, fmt.Sprintf("  %s [%s]: %s", name, opt.kind, values))
 		}
 	} else {
 		lines = append(lines, "  [none]")
@@ -553,8 +594,8 @@ func (parser *ArgParser) String() string {
 	}
 
 	lines = append(lines, "\nCommand:")
-	if parser.HasCommand() {
-		lines = append(lines, fmt.Sprintf("  %v", parser.CommandName()))
+	if parser.FoundCommandName != "" {
+		lines = append(lines, fmt.Sprintf("  %v", parser.FoundCommandName))
 	} else {
 		lines = append(lines, "  [none]")
 	}

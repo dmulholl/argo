@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/dmulholl/argo"
 )
 
@@ -16,6 +18,10 @@ func main() {
 	parser.NewStringOption("bar b", "fallback")
 
 	// Parse the command line arguments.
-	parser.Parse()
+	if err := parser.ParseOsArgs(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+		os.Exit(1)
+	}
+
 	fmt.Println(parser)
 }
