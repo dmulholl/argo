@@ -10,7 +10,7 @@ We also want to support an `--out/-o` option so the user can specify an output f
 First we import the Argo package:
 
 ::: code go
-    import "github.com/dmulholl/argo"
+    import "github.com/dmulholl/argo/v4"
 
 Next we create an `ArgParser` instance:
 
@@ -30,9 +30,14 @@ Now we can register our options and flags:
 That's it, we're done specifying our interface. Now we can parse the program's command line arguments:
 
 ::: code go
-    parser.Parse()
+    if err := parser.ParseOsArgs(); err != nil {
+        fmt.Fprintf(os.Stderr, "error: %s\n", err)
+        os.Exit(1)
+    }
 
-This will exit with a suitable error message for the user if anything goes wrong. Now we can check if the `--quiet` flag was found:
+This will exit with a suitable error message for the user if any of the command line arguments are invaid.
+
+Now we can check if the `--quiet` flag was found:
 
 ::: code go
     if parser.Found("quiet") {
