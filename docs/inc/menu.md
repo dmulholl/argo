@@ -1,6 +1,6 @@
 * [Home](@root/)
 * [Quickstart](@root/quickstart//)
 * [CLI](@root/cli//)
-* [API](https://pkg.go.dev/github.com/dmulholl/argo)
+* [API](https://pkg.go.dev/github.com/dmulholl/argo/v4)
 * [License](@root/license//)
 * [Github](https://github.com/dmulholl/argo)
