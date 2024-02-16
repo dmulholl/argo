@@ -39,7 +39,7 @@ Import the `argo` package:
 * [Documentation](https://www.dmulholl.com/docs/argo/master/)
 * [Simple Example](https://github.com/dmulholl/argo/blob/master/cmd/simple-example/main.go)
 * [Command Example](https://github.com/dmulholl/argo/blob/master/cmd/command-example/main.go)
-* [API Documentation](https://pkg.go.dev/github.com/dmulholl/argo)
+* [API Documentation](https://pkg.go.dev/github.com/dmulholl/argo/v4)
 
 
 ## License
