@@ -23,13 +23,15 @@ A minimalist Go library for parsing command line arguments.
 
 Install the `argo` package:
 
-::: code
+```
     go get github.com/dmulholl/argo/v4
+```
 
 Import the `argo` package:
 
-::: code go
+```go
     import "github.com/dmulholl/argo/v4"
+```
 
 
 ### Links
