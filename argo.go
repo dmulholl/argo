@@ -26,8 +26,7 @@ type option struct {
 	floatFallback  float64
 }
 
-// This method attempts to set the option's value by parsing a string argument.
-func (opt *option) trySetValue(arg string) error {
+func (opt *option) tryAppendValue(arg string) error {
 	switch opt.kind {
 	case "string":
 		opt.stringValues = append(opt.stringValues, arg)
@@ -238,9 +237,8 @@ func (parser *ArgParser) StringValue(name string) string {
 	opt := parser.getOpt(name)
 	if len(opt.stringValues) > 0 {
 		return opt.stringValues[len(opt.stringValues)-1]
-	} else {
-		return opt.stringFallback
 	}
+	return opt.stringFallback
 }
 
 // IntValue returns the value of the specified integer-valued option.
@@ -251,9 +249,8 @@ func (parser *ArgParser) IntValue(name string) int {
 	opt := parser.getOpt(name)
 	if len(opt.intValues) > 0 {
 		return opt.intValues[len(opt.intValues)-1]
-	} else {
-		return opt.intFallback
 	}
+	return opt.intFallback
 }
 
 // FloatValue returns the value of the specified float-valued option.
@@ -264,9 +261,8 @@ func (parser *ArgParser) FloatValue(name string) float64 {
 	opt := parser.getOpt(name)
 	if len(opt.floatValues) > 0 {
 		return opt.floatValues[len(opt.floatValues)-1]
-	} else {
-		return opt.floatFallback
 	}
+	return opt.floatFallback
 }
 
 // StringValues returns the specified string-valued option's list of values.
@@ -440,7 +436,7 @@ func (parser *ArgParser) parseLongOption(arg string, stream *argstream) error {
 			return nil
 		}
 		if stream.hasNext() {
-			return opt.trySetValue(stream.next())
+			return opt.tryAppendValue(stream.next())
 		}
 		return fmt.Errorf("missing argument for option --%v", arg)
 	}
@@ -478,7 +474,7 @@ func (parser *ArgParser) parseShortOption(arg string, stream *argstream) error {
 				continue
 			}
 			if stream.hasNext() {
-				if err := opt.trySetValue(stream.next()); err != nil {
+				if err := opt.tryAppendValue(stream.next()); err != nil {
 					return err
 				}
 				continue
@@ -535,7 +531,7 @@ func (parser *ArgParser) parseEqualsOption(prefix string, arg string) error {
 	}
 
 	// Try to parse the argument as a value of the appropriate type.
-	return opt.trySetValue(value)
+	return opt.tryAppendValue(value)
 }
 
 // -------------------------------------------------------------------------

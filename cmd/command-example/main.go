@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dmulholl/argo"
+	"github.com/dmulholl/argo/v4"
 )
 
 func cmdBooHandler(cmdName string, cmdParser *argo.ArgParser) error {
@@ -15,7 +15,7 @@ func cmdBooHandler(cmdName string, cmdParser *argo.ArgParser) error {
 }
 
 func main() {
-	// Instantiate an ArgParser instance.
+	// Create a new ArgParser instance.
 	parser := argo.NewParser()
 	parser.Helptext = "Usage: example..."
 	parser.Version = "1.2.3"
