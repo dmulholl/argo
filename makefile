@@ -17,4 +17,4 @@ test-verbose: ## Runs unit tests verbosely.
 	go test ./... -v
 
 clean: ## Deletes all build artifacts.
-	rm -rf ./build/*
+	rm -rf ./build
