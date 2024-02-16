@@ -3,7 +3,7 @@
 A minimalist Go library for parsing command line arguments.
 
 
-### Features
+## Features
 
 * Long-form boolean flags with single-character shortcuts: `--flag`, `-f`.
 
@@ -19,7 +19,7 @@ A minimalist Go library for parsing command line arguments.
 * Support for git-style command interfaces with arbitrarily-nested commands.
 
 
-### Installation
+## Installation
 
 Install the `argo` package:
 
@@ -34,7 +34,7 @@ Import the `argo` package:
 ```
 
 
-### Links
+## Links
 
 * [Documentation](https://www.dmulholl.com/docs/argo/master/)
 * [Simple Example](https://github.com/dmulholl/argo/blob/master/cmd/simple-example/main.go)
@@ -42,6 +42,6 @@ Import the `argo` package:
 * [API Documentation](https://pkg.go.dev/github.com/dmulholl/argo)
 
 
-### License
+## License
 
 Zero-Clause BSD (0BSD).
